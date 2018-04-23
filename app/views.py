@@ -6,8 +6,12 @@ This file creates your application.
 """
 
 from app import app
-from flask import render_template, request
+from flask import render_template, request, session
 from controllers import form_errors
+from flask_login import login_user, logout_user, current_user, login_required
+from froms import LoginForm, RegistrationForm, PostsForm
+from models import UserProfile, UserPosts, UserFollows, UserLikes
+from werkzeug.utils import secure_filename
 ###
 # Routing for your application.
 ###
@@ -21,6 +25,61 @@ def index():
 ###
 # The functions below should be applicable to all Flask apps.
 ###
+
+@app.route('/api/users/register', methods = ['POST'])
+def userRegister():
+    form = RegistrationForm()
+    if request.method == 'POST' and form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+        firstname = form.firstname.data
+        lastname = form.lastname.data
+        email = form.email.data
+        location = form.location.data
+        biography = form.biography.data
+        photo = form.photo.data
+
+        UserProfile.query.filter_by(username=username, password=password).first():
+
+        filename= secure_filename(photo.filename)
+        photo.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
+
+        user = UserProfile(user_name=username, password=password, first_name=firstname, last_name=lastname, email=email, location=location, biography=biography, profile_photo=filename)
+
+        db.session.add(user)
+        db.session.commit()
+        return redirect(url_for('register'))
+
+@app.route('/api/auth/login', methods = ['POST'])
+def userLogin():
+    form = LoginForm()
+    if request.method == 'POST' and form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+
+@app.route('/api/auth/logout', methods = ['GET'])
+def userLogout():
+
+@app.route('/api/users/<user_id>/posts', methods = ['POST'])
+def addPost():
+    form = PostsForm()
+    if request.method =='POST' and form.validate_on_submit():
+        photo = form.photo.data
+        caption = form.caption.data 
+
+@app.route('/api/users/<user_id>/posts', methods = ['GET'])
+def userPosts():
+
+@app.route('/api/users/>user_id>/follow', methods = ['POST'])
+def userFollow():
+
+
+@app.route('/api/posts', methods = ['GET'])
+def allPosts():
+
+
+@app.route('/api/posts/<post_id>/like', methods = ['POST'])
+def userLike():
 
 
 @app.route('/<file_name>.txt')
