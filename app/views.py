@@ -18,10 +18,6 @@ def index():
     """Render website's initial page and let VueJS take over."""
     return render_template('index.html')
 
-
-
-
-
 ###
 # The functions below should be applicable to all Flask apps.
 ###

@@ -31,8 +31,12 @@ Vue.component('app-footer', {
 const Home = Vue.component('home', {
    template: `
     <div class="jumbotron">
-        <h1>Lab 7</h1>
-        <p class="lead">In this lab we will demonstrate VueJS working with Forms and Form Validation from Flask-WTF.</p>
+        <h1>Photogram Web Application</h1>
+        <p class="lead">
+You should be able to register for an account on our Photogram web application.
+ Once a user has an account, they should be able to login and upload photos to 
+ their Photogram feed. Each photo, should have an image and a caption. A user 
+ should also be able to "Like" another users posts and also follow a user.</p>
     </div>
    `,
     data: function() {
