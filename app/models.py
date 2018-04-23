@@ -56,6 +56,12 @@ class UserPosts(db.Model):
     caption = db.Column(db.String(80))
     created_on = db.Column(db.String(80))
 
+    def __init__(self,user_id,photo,caption,created_on):
+        self.user_id=user_id
+        self.photo= photo
+        self.caption=caption
+        self.created_on=created_on
+
 
 class UserLikes(db.Model):
     __tablename__ = 'likes'
@@ -63,11 +69,19 @@ class UserLikes(db.Model):
     user_id = db.Column(db.Integer)
     post_id = db.Column(db.Integer)
 
+    def __init__(self,user_id,post_id):
+        self.user_id=user_id
+        self.post_id=post_id
+
 
 class UserFollows(db.Model):
     __tablename__ = 'follows'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer)
     follower_id = db.Column(db.Integer)
+
+    def __init__(self,user_id,follower_id):
+        self.user_id=user_id
+        self.follower_id=follower_id
 
     
