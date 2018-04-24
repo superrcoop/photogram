@@ -102,7 +102,7 @@ def addPost():
     form = PostsForm()
     if request.method == 'GET':
         post=Posts.query.filter_by(user_id=user_id).all()
-        return jsonify({})
+        return jsonify({ #add array function})
         
     if request.method =='POST' and form.validate_on_submit():
         photo = form.photo.data
@@ -120,7 +120,7 @@ def addPost():
 @app.route('/api/users/<int:user_id>/follow', methods = ['POST'])
 def userFollow(user_id):
     if request.method == 'POST':
-        userfollow=(user_id,current_user.id)
+        userfollow=Follows(user_id,current_user.id)
         db.session.add(userfollow)
         db.session.commit()
         user=Users.query.filter_by(id=user_id).first()
@@ -130,12 +130,17 @@ def userFollow(user_id):
 @app.route('/api/posts', methods = ['GET'])
 def allPosts():
     posts = Posts.query.order_by(Posts.created_on).all()
-    return jsonify({'posts':})
+    return jsonify({'posts': #add array function})
 
 
 @app.route('/api/posts/<int:post_id>/like', methods = ['POST'])
 def userLike(post_id):
     if request.method == 'POST':
+        userlike=Likes(post_id,current_user.id)
+        db.session.add(userlike)
+        db.session.commit()
+        # add count function
+        
         
 
 
