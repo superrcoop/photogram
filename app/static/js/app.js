@@ -1,53 +1,88 @@
-/* Add your Application JavaScript */
+
 Vue.component('app-header', {
     template: `
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
-      <a class="navbar-brand" href="#">Lab 7</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-    
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <router-link class="nav-link" to="/">Home <span class="sr-only">(current)</span></router-link>
-          </li>
-        </ul>
-      </div>
-    </nav>
+        <div class="container">
+          <div class="flux">Photogram </div>
+        </div>
     `
 });
 
 Vue.component('app-footer', {
     template: `
     <footer>
-        <div class="container">
-            <p>Copyright &copy; Flask Inc.</p>
-        </div>
+      <div class="footer">
+        <p>&copy; Photogram 2018. All Rights Reserved </p>
+      </div>
     </footer>
     `
 });
-
-const Home = Vue.component('home', {
-   template: `
-    <div class="jumbotron">
-        <h1>Photogram Web Application</h1>
-        <p class="lead">
-You should be able to register for an account on our Photogram web application.
- Once a user has an account, they should be able to login and upload photos to 
- their Photogram feed. Each photo, should have an image and a caption. A user 
- should also be able to "Like" another users posts and also follow a user.</p>
-    </div>
-   `,
-    data: function() {
-       return {}
-    }
+const Register = Vue.component('registration',{
+  template:`
+      <form action="#" method="post">
+      <h2>Join Photogram today.</h2>
+      <div class="agile_ihj">
+        <div class="agileinfo">
+          <input type="text" name="name" placeholder="First Name" required="">
+        </div>
+        <div class="agileinfo">
+          <input type="text" name="name" placeholder="Last Name" required="">
+        </div>
+        <div class="agileinfo">
+          <input type="email" name="email" placeholder="Email" required="">
+        </div>
+        <div class="agileinfo">
+          <input type="Password" name="password" placeholder="Password" required="">
+        </div>
+        <div class="agileinfo">
+          <input type="password" name="password" placeholder="Confirm Password" required="">
+        </div>
+        <div class="agile_par">
+          <p>Already had an Account please <router-link class="nav-link" to="/login">Login</router-link></p>
+        </div>
+        <div class="w3l_but">
+          <button type="submit">REGISTER</button>
+        </div>
+      </form>
+      
+      <div class="clear"></div>
+`,
+ data:function(){
+  return {}
+ }
 });
+
+const Login = Vue.component('login',{
+  template:`
+      <form action="#" method="post">
+      <h2>Log in to Photogram</h2>
+      <div class="agile_ihj">
+        <div class="agileinfo">
+          <input type="text" name="name" placeholder="First Name" required="">
+        </div>
+        <div class="agileinfo">
+          <input type="Password" name="password" placeholder="Password" required="">
+        </div>
+        <div class="agile_par">
+          <p>Dont have an Account? <router-link class="nav-link" to="/">Register Now</router-link></p>
+        </div>
+        <div class="w3l_but">
+          <button type="submit">LOGIN</button>
+        </div>
+      </form>
+      
+      <div class="clear"></div>
+`,
+ data:function(){
+  return {}
+ }
+});
+
 
 // Define Routes
 const router = new VueRouter({
     routes: [
-        { path: "/", component: Home }
+        { path: "/", component: Register },
+        { path: "/login", component : Login}
     ]
 });
 

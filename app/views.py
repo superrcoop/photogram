@@ -2,19 +2,16 @@
 Flask Documentation:     http://flask.pocoo.org/docs/
 Jinja2 Documentation:    http://jinja.pocoo.org/2/documentation/
 Werkzeug Documentation:  http://werkzeug.pocoo.org/documentation/
-This file creates your application.
 """
 
-from app import app
+from app import app, db, login_manager
 from flask import render_template, request, session
 from controllers import form_errors
 from flask_login import login_user, logout_user, current_user, login_required
-from froms import LoginForm, RegistrationForm, PostsForm
-from models import UserProfile, UserPosts, UserFollows, UserLikes
+from forms import LoginForm, RegistrationForm, PostsForm
+from models import Users, Posts, Follows, Likes
 from werkzeug.utils import secure_filename
-###
-# Routing for your application.
-###
+from werkzeug.datastructures import CombinedMultiDict
 
 
 @app.route('/')
@@ -22,10 +19,8 @@ def index():
     """Render website's initial page and let VueJS take over."""
     return render_template('index.html')
 
-###
-# The functions below should be applicable to all Flask apps.
-###
 
+"""
 @app.route('/api/users/register', methods = ['POST'])
 def userRegister():
     form = RegistrationForm()
@@ -81,7 +76,7 @@ def allPosts():
 @app.route('/api/posts/<post_id>/like', methods = ['POST'])
 def userLike():
 
-
+"""
 @app.route('/<file_name>.txt')
 def send_text_file(file_name):
     """Send your static text file."""
@@ -105,6 +100,12 @@ def add_header(response):
 def page_not_found(error):
     """Custom 404 page."""
     return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def page_not_found(error):
+    """Custom 500 page."""
+    return render_template('500.html'), 500
+
 
 
 if __name__ == '__main__':
