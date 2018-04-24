@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy  import SQLAlchemy
-import os , psycopg2
 from flask_login import LoginManager
+from flask_wtf.csrf import CSRFProtect
 
 
 app = Flask(__name__)
@@ -13,14 +13,15 @@ login_manager.login_view = 'login'
 login_manager.session_protection = "strong"
 
 UPLOAD_FOLDER = './app/static/uploads'
-DATABASE_URL = os.environ['DATABASE_URL']
+
 
 app.config['SECRET_KEY'] = 'pH0t0Gr@l^l'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://project2:password@localhost/photogram"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] 	= True
+csrf = CSRFProtect(app)
 
-conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+
 db = SQLAlchemy(app)
 
 from app import views

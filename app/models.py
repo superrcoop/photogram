@@ -8,8 +8,8 @@ def get_new_id():
 	return new_id
 	
 
-class UserProfile(db.Model):
-    __tablename__ = 'UserProfile'
+class Users(db.Model):
+    __tablename__ = 'Users'
     id = db.Column(db.Integer, primary_key=True)
     user_name = db.Column(db.String(80))
     password = db.Column(db.String(80))
@@ -47,14 +47,17 @@ class UserProfile(db.Model):
             return unicode(self.id)  # python 2 support
         except NameError:
             return str(self.id)  # python 3 support
+
+    def __repr__(self):
+        return'<User %r>' % (self.user_name)
         
-class UserPosts(db.Model):
+class Posts(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
     photo = db.Column(db.String(80))
-    caption = db.Column(db.String(80))
-    created_on = db.Column(db.String(80))
+    caption = db.Column(db.String(255))
+    created_on = db.Column(db.DateTime)
 
     def __init__(self,user_id,photo,caption,created_on):
         self.user_id=user_id
@@ -63,22 +66,22 @@ class UserPosts(db.Model):
         self.created_on=created_on
 
 
-class UserLikes(db.Model):
+class Likes(db.Model):
     __tablename__ = 'likes'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer)
-    post_id = db.Column(db.Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
+    post_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
 
     def __init__(self,user_id,post_id):
         self.user_id=user_id
         self.post_id=post_id
 
 
-class UserFollows(db.Model):
+class Follows(db.Model):
     __tablename__ = 'follows'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer)
-    follower_id = db.Column(db.Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
+    follower_id = db.Column(db.Integer, db.ForeignKey('Users.id'))
 
     def __init__(self,user_id,follower_id):
         self.user_id=user_id
