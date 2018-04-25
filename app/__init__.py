@@ -13,14 +13,14 @@ login_manager.login_view = 'login'
 login_manager.session_protection = "strong"
 
 UPLOAD_FOLDER = './app/static/uploads'
-#DATABASE_URL = os.environ['DATABASE_URL']
+DATABASE_URL = os.environ['DATABASE_URL'] #'postgresql://user[:password]@localhost/photogram'
 
 app.config['SECRET_KEY'] = 'pH0t0Gr@l^l'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-#app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] 	= True
 
-#conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+conn = psycopg2.connect(DATABASE_URL)
 db = SQLAlchemy(app)
 
 from app import views

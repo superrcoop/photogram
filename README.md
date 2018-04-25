@@ -35,9 +35,9 @@ Export database URL:
 Setup database: 
 
 ~~~
-$ python manage.py db init
-$ python manage.py db migrate
-$ python manage.py db upgrade
+$ python flask-migrations.py db init
+$ python flask-migrations.py db migrate
+$ python flask-migrations.py db upgrade
 ~~~
 
 Run:

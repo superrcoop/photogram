@@ -1,33 +1,50 @@
-/*
-Vue.component('app-header', {
+
+Vue.component('side-nav', {
     template: `
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
-      <a class="navbar-brand" href="#">Lab 7</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-    
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <router-link class="nav-link" to="/">Home <span class="sr-only">(current)</span></router-link>
-          </li>
-        </ul>
-      </div>
-    </nav>
+    <aside class="sidebar-left">
+                <div class="container">
+                    <div class="flux">Photogram </div>
+                </div>
+                <ul class="sidebar-menu">
+                    <li class="treeview active">
+                        <a href="index.html">
+                            <i class="fas fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="treeview">
+                        <a href="about.html">
+                            <i class="fas fa-info"></i>
+                            <span>Upload</span>
+                        </a>
+                    </li>
+                    <li class="treeview">
+                        <a href="services.html">
+                            <i class="fab fa-servicestack"></i>
+                            <span>Profile</span>
+                        </a>
+                    </li>
+                    <li class="treeview">
+                        <a href="portfolio.html">
+                            <i class="fab fa-buromobelexperte"></i>
+                            <span>Search</span>
+                        </a>
+                    </li>
+                    <li class="treeview">
+                        <a href="portfolio.html">
+                            <i class="fab fa-buromobelexperte"></i>
+                            <span>Likes</span>
+                        </a>
+                    </li>
+                </ul>
+                <button type="button" class="btn btn-info btn-lg btn-block mt-5 w3ls-btn p-1 text-uppercase font-weight-bold" data-toggle="modal"
+                    aria-pressed="false" data-target="#exampleModal">
+                    Logout
+                </button>
+            </aside>
     `
 });
 
- */
-Vue.component('app-header', {
-    template: `
-      <div class="wrapper">
-        <div class="floater"> 
-          <div class="text">Photogram<i class="fas fa-camera"></i></div>
-        </div>
-      </div>
-    `
-});
 
 Vue.component('app-footer', {
     template: `
@@ -38,11 +55,56 @@ Vue.component('app-footer', {
     </footer>
     `
 });
-const Login = Vue.component('registration',{
+
+Vue.component('card', {
+    template: `
+    <div class="card col-lg-3 col-md-6 border-0 mt-md-0 mt-5">
+            <img class="card-img-top" src="images/a2.jpg " alt="Card image cap ">
+            <div class="card-body bg-light text-center">
+              <h5 class="card-title ">custom menus</h5>
+              <p class="card-text mb-3 ">Class aptent taciti sociosqu ad litora torquent per conubia nostra per inceptos himenaeos.</p>
+              <a href="#ab-bot" class="btn scroll">View More</a>
+            </div>
+          </div>
+    `
+});
+
+const Timeline = Vue.component('timeline',{
   template:`
-    <div class="container">
-      
-    </div>
+    <section class="wthree-row py-sm-5 py-3">
+      <div class="container py-md-5">
+        <div class="py-lg-5 py-3 bg-pricemain text-center">
+          <h3 class="agile-title text-uppercase">about us</h3>
+          <span class="w3-line"></span>
+        </div>
+        <div class="row py-lg-5 pt-md-5 pt-3 d-flex justify-content-center">
+          <div class="card col-lg-3 col-md-6 border-0">
+            <div class="card-body bg-light">
+              <div class="card-img-top pt-3">
+                <h5 class=" card-title">day trading</h5>
+              </div>
+              <p class="card-text mb-3 ">Class aptent taciti sociosqu ad litora torquent per conubia nostra per inceptos himenaeos.</p>
+            </div>
+            <img class="card-img-top" src="images/a1.png" alt="Card image cap">
+          </div>
+          <div class="card col-lg-3 col-md-6 border-0 mt-lg-0 mt-5 ">
+            <img class="card-img-top " src="images/a3.jpg " alt="Card image cap ">
+            <div class="card-body bg-light text-center">
+              <h5 class="card-title ">user friendly</h5>
+              <p class="card-text mb-3 ">Class aptent taciti sociosqu ad litora torquent per conubia nostra per inceptos himenaeos.</p>
+              <a href="#ab-bot" class="btn scroll">View More</a>
+            </div>
+          </div>
+          <div class="card col-lg-3 col-md-6 border-0 mt-lg-0 mt-5 text-right">
+            <div class="card-body bg-light">
+              <h5 class="card-title  pt-3">annual bonus</h5>
+              <p class="card-text mb-3 ">Class aptent taciti sociosqu ad litora torquent per conubia nostra per inceptos himenaeos.</p>
+            </div>
+            <img class="card-img-top " src="images/a4.png " alt="Card image cap ">
+          </div>
+        </div>
+      </div>
+    </section>
 `,
  data:function(){
   return {}
@@ -51,26 +113,162 @@ const Login = Vue.component('registration',{
 
 
 
-const Home = Vue.component('home', {
+const Likes = Vue.component('Likes', {
    template: `
-    <div class="jumbotron">
-        <h1>Photogram Web Application</h1>
-        <p class="lead">
-You should be able to register for an account on our Photogram web application.
- Once a user has an account, they should be able to login and upload photos to 
- their Photogram feed. Each photo, should have an image and a caption. A user 
- should also be able to "Like" another users posts and also follow a user.</p>
-    </div>
+    <section class="wthree-row py-sm-5 py-3">
+      <div class="container py-md-5">
+        <div class="py-lg-5 py-3 bg-pricemain text-center">
+          <h3 class="agile-title text-uppercase">about us</h3>
+          <span class="w3-line"></span>
+        </div>
+        <div class="row py-lg-5 pt-md-5 pt-3 d-flex justify-content-center">
+          <div class="card col-lg-3 col-md-6 border-0">
+            <div class="card-body bg-light">
+              <div class="card-img-top pt-3">
+                <h5 class=" card-title">day trading</h5>
+              </div>
+              <p class="card-text mb-3 ">Class aptent taciti sociosqu ad litora torquent per conubia nostra per inceptos himenaeos.</p>
+            </div>
+            <img class="card-img-top" src="images/a1.png" alt="Card image cap">
+          </div>
+          <div class="card col-lg-3 col-md-6 border-0 mt-md-0 mt-5">
+            <img class="card-img-top" src="images/a2.jpg " alt="Card image cap ">
+            <div class="card-body bg-light text-center">
+              <h5 class="card-title ">custom menus</h5>
+              <p class="card-text mb-3 ">Class aptent taciti sociosqu ad litora torquent per conubia nostra per inceptos himenaeos.</p>
+              <a href="#ab-bot" class="btn scroll">View More</a>
+            </div>
+          </div>
+          <div class="card col-lg-3 col-md-6 border-0 mt-lg-0 mt-5 ">
+            <img class="card-img-top " src="images/a3.jpg " alt="Card image cap ">
+            <div class="card-body bg-light text-center">
+              <h5 class="card-title ">user friendly</h5>
+              <p class="card-text mb-3 ">Class aptent taciti sociosqu ad litora torquent per conubia nostra per inceptos himenaeos.</p>
+              <a href="#ab-bot" class="btn scroll">View More</a>
+            </div>
+          </div>
+          <div class="card col-lg-3 col-md-6 border-0 mt-lg-0 mt-5 text-right">
+            <div class="card-body bg-light">
+              <h5 class="card-title  pt-3">annual bonus</h5>
+              <p class="card-text mb-3 ">Class aptent taciti sociosqu ad litora torquent per conubia nostra per inceptos himenaeos.</p>
+            </div>
+            <img class="card-img-top " src="images/a4.png " alt="Card image cap ">
+          </div>
+        </div>
+      </div>
+    </section>
    `,
     data: function() {
        return {}
     }
 });
 
+const Profile = Vue.component('Profile', {
+   template: `
+    <section class="wthree-row py-sm-5 py-3">
+      <div class="container py-md-5">
+        <div class="py-lg-5 py-3 bg-pricemain text-center">
+          <h3 class="agile-title text-uppercase">about us</h3>
+          <span class="w3-line"></span>
+        </div>
+        <div class="row py-lg-5 pt-md-5 pt-3 d-flex justify-content-center">
+          <div class="card col-lg-3 col-md-6 border-0">
+            <div class="card-body bg-light">
+              <div class="card-img-top pt-3">
+                <h5 class=" card-title">day trading</h5>
+              </div>
+              <p class="card-text mb-3 ">Class aptent taciti sociosqu ad litora torquent per conubia nostra per inceptos himenaeos.</p>
+            </div>
+            <img class="card-img-top" src="images/a1.png" alt="Card image cap">
+          </div>
+          <div class="card col-lg-3 col-md-6 border-0 mt-md-0 mt-5">
+            <img class="card-img-top" src="images/a2.jpg " alt="Card image cap ">
+            <div class="card-body bg-light text-center">
+              <h5 class="card-title ">custom menus</h5>
+              <p class="card-text mb-3 ">Class aptent taciti sociosqu ad litora torquent per conubia nostra per inceptos himenaeos.</p>
+              <a href="#ab-bot" class="btn scroll">View More</a>
+            </div>
+          </div>
+          <div class="card col-lg-3 col-md-6 border-0 mt-lg-0 mt-5 ">
+            <img class="card-img-top " src="images/a3.jpg " alt="Card image cap ">
+            <div class="card-body bg-light text-center">
+              <h5 class="card-title ">user friendly</h5>
+              <p class="card-text mb-3 ">Class aptent taciti sociosqu ad litora torquent per conubia nostra per inceptos himenaeos.</p>
+              <a href="#ab-bot" class="btn scroll">View More</a>
+            </div>
+          </div>
+          <div class="card col-lg-3 col-md-6 border-0 mt-lg-0 mt-5 text-right">
+            <div class="card-body bg-light">
+              <h5 class="card-title  pt-3">annual bonus</h5>
+              <p class="card-text mb-3 ">Class aptent taciti sociosqu ad litora torquent per conubia nostra per inceptos himenaeos.</p>
+            </div>
+            <img class="card-img-top " src="images/a4.png " alt="Card image cap ">
+          </div>
+        </div>
+      </div>
+    </section>
+   `,
+    data: function() {
+       return {}
+    }
+});
+
+const Search = Vue.component('Search', {
+   template: `
+    <section class="wthree-row py-sm-5 py-3">
+      <div class="container py-md-5">
+        <div class="py-lg-5 py-3 bg-pricemain text-center">
+          <h3 class="agile-title text-uppercase">about us</h3>
+          <span class="w3-line"></span>
+        </div>
+        <div class="row py-lg-5 pt-md-5 pt-3 d-flex justify-content-center">
+          <div class="card col-lg-3 col-md-6 border-0">
+            <div class="card-body bg-light">
+              <div class="card-img-top pt-3">
+                <h5 class=" card-title">day trading</h5>
+              </div>
+              <p class="card-text mb-3 ">Class aptent taciti sociosqu ad litora torquent per conubia nostra per inceptos himenaeos.</p>
+            </div>
+            <img class="card-img-top" src="images/a1.png" alt="Card image cap">
+          </div>
+          <div class="card col-lg-3 col-md-6 border-0 mt-md-0 mt-5">
+            <img class="card-img-top" src="images/a2.jpg " alt="Card image cap ">
+            <div class="card-body bg-light text-center">
+              <h5 class="card-title ">custom menus</h5>
+              <p class="card-text mb-3 ">Class aptent taciti sociosqu ad litora torquent per conubia nostra per inceptos himenaeos.</p>
+              <a href="#ab-bot" class="btn scroll">View More</a>
+            </div>
+          </div>
+          <div class="card col-lg-3 col-md-6 border-0 mt-lg-0 mt-5 ">
+            <img class="card-img-top " src="images/a3.jpg " alt="Card image cap ">
+            <div class="card-body bg-light text-center">
+              <h5 class="card-title ">user friendly</h5>
+              <p class="card-text mb-3 ">Class aptent taciti sociosqu ad litora torquent per conubia nostra per inceptos himenaeos.</p>
+              <a href="#ab-bot" class="btn scroll">View More</a>
+            </div>
+          </div>
+          <div class="card col-lg-3 col-md-6 border-0 mt-lg-0 mt-5 text-right">
+            <div class="card-body bg-light">
+              <h5 class="card-title  pt-3">annual bonus</h5>
+              <p class="card-text mb-3 ">Class aptent taciti sociosqu ad litora torquent per conubia nostra per inceptos himenaeos.</p>
+            </div>
+            <img class="card-img-top " src="images/a4.png " alt="Card image cap ">
+          </div>
+        </div>
+      </div>
+    </section>
+   `,
+    data: function() {
+       return {}
+    }
+});
 // Define Routes
 const router = new VueRouter({
     routes: [
-        { path: "/bhj", component: Home }
+        { path: "/", component: Timeline }
+        { path: "/search", component: Timeline }
+        { path: "/Profile", component: Timeline }
+        { path: "/", component: Timeline }
     ]
 });
 

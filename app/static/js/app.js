@@ -19,13 +19,16 @@ Vue.component('app-footer', {
 const Register = Vue.component('registration',{
   template:`
       <form action="#" method="post">
-      <h2>Join Photogram today.</h2>
+      <h2>Join Photogram today</h2>
       <div class="agile_ihj">
         <div class="agileinfo">
           <input type="text" name="name" placeholder="First Name" required="">
         </div>
         <div class="agileinfo">
           <input type="text" name="name" placeholder="Last Name" required="">
+        </div>
+        <div class="agileinfo">
+          <input type="text" name="username" placeholder="Username" required="">
         </div>
         <div class="agileinfo">
           <input type="email" name="email" placeholder="Email" required="">
@@ -36,8 +39,21 @@ const Register = Vue.component('registration',{
         <div class="agileinfo">
           <input type="password" name="password" placeholder="Confirm Password" required="">
         </div>
+        <div class="agileinfo">
+          <input type="text" name="location" placeholder="Location" required="">
+        </div>
+        <div id="drop">
+        Upload Profile Photo
+
+        <a>Browse</a>
+        <input type="file" name="upl"  />
+      </div>
+
+      <ul>
+        <!-- The file uploads will be shown here -->
+      </ul>
         <div class="agile_par">
-          <p>Already had an Account please <router-link class="nav-link" to="/login">Login</router-link></p>
+          <p>Already had an Account please <router-link to="/login">Login</router-link></p>
         </div>
         <div class="w3l_but">
           <button type="submit">REGISTER</button>
