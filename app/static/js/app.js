@@ -79,7 +79,7 @@ const Login = Vue.component('login',{
           <input type="Password" name="password" placeholder="Password" required="">
         </div>
         <div class="agile_par">
-          <p>Dont have an Account? <router-link class="nav-link" to="/">Register Now</router-link></p>
+          <p>Dont have an Account? <router-link class="nav-link" to="/register">Register Now</router-link></p>
         </div>
         <div class="w3l_but">
           <button type="submit">LOGIN</button>
@@ -97,7 +97,7 @@ const Login = Vue.component('login',{
 // Define Routes
 const router = new VueRouter({
     routes: [
-        { path: "/", component: Register },
+        { path: "/register", component: Register },
         { path: "/login", component : Login}
     ]
 });

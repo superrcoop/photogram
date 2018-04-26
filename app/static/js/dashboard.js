@@ -98,11 +98,11 @@ Vue.component('dashboard-nav', {
     template: `
     <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
   <div class="btn-group" role="group" aria-label="First group">
-  <button type="button" class="btn btn-secondary">Upload</button>
-    <button type="button" class="btn btn-secondary">Explore(All)</button>
-    <button type="button" class="btn btn-secondary">My Posts</button>
-    <button type="button" class="btn btn-secondary">Following</button>
-    <button type="button" class="btn btn-secondary">Liked</button>
+  <router-link class="btn btn-secondary" to="/upload">Upload</router-link>
+  <router-link class="btn btn-secondary" to="/timeline">Explore(ALL)</router-link>
+  <router-link class="btn btn-secondary" to="/profile">My Posts</router-link>
+  <router-link class="btn btn-secondary" to="/following">Following</router-link>
+  <router-link class="btn btn-secondary" to="/likes">Liked</router-link>
   </div>
   <div class="input-group">
   <button type="button" class="btn btn-secondary input-group-addon" id="btnGroupAddon2">Search</button>
@@ -229,7 +229,7 @@ const Search = Vue.component('search', {
 // Define Routes
 const router = new VueRouter({
     routes: [
-        { path: "/", component: Timeline },
+        { path: "/timeline", component: Timeline },
         { path: "/search", component: Search },
         { path: "/profile", component: Profile },
         { path: "/likes", component: Likes },
