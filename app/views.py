@@ -19,6 +19,10 @@ def index():
     """Render website's initial page and let VueJS take over."""
     return render_template('index.html')
 
+@app.route('/dashboard')
+def dashboard():
+    """Render website's initial page and let VueJS take over."""
+    return render_template('feed.html')
 
 """
 @app.route('/api/users/register', methods = ['POST'])

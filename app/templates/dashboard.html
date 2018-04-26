@@ -14,69 +14,34 @@
     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/SidebarNav.min.css') }}">
     <link href="https://fonts.googleapis.com/css?family=Pacifico" rel="stylesheet">
+
+     <link rel="stylesheet" href="{{ url_for('static', filename='css/photogram.css') }}">
     <!-- titles -->
     <link href="https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:200,300,400,700" rel="stylesheet">
     <!-- body -->
     <link href="https://fonts.googleapis.com/css?family=PT+Sans:400,400i,700,700i" rel="stylesheet">
     {% block css %} {% endblock%}
   </head>
-  <body class="cbp-spmenu-push">
-    <div class="main-content">
-        <div class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-left" id="cbp-spmenu-s1">
-            {% block sidenav %} {% endblock%}
-        </div>
-    </div>
-    <!--left-fixed -navigation-->
-    <!-- header-starts -->
-    <header class="header-section">
-        <div class="header-left  clearfix">
-            <!--logo start-->
-            <div class="brand">
-                <button id="showLeftPush">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
-            <!--logo end-->
-        </div>
-        <div class="header-right">
-        </div>
-    </header>
-    <!-- //header-ends -->
+  <body>
+    <div id="page-wrapper">
         {% block main %}{% endblock %}
-
         <!-- //login and register modal -->
-        <div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel1" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel1">Logout</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <img src="images/modal.jpg" alt="" class="img-fluid" />
-                        <button type="button">LOGOUT
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        
     </div>
 
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" ></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/vue.js') }}"></script>
     <script src="{{ url_for('static', filename='js/vue-router.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='js/counter.js') }}"></script>
     <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
     <script src="{{ url_for('static', filename='js/SmoothScroll.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/SidebarNav.min.js') }}"></script>
 
     {% block js %} {% endblock%}
   </body>

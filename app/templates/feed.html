@@ -1,16 +1,16 @@
 {% extends "dashboard.html" %}
 {% block title %} <title>Photogram</title>{% endblock%}
-{% block sidenav%}
-<!--left-fixed -navigation-->
-            <side-nav></side-nav>
-{% endblock%}
 {% block main %}
 <div id="photogram">
+
+    <dashboard-header></dashboard-header>
+
+    <dashboard-nav></dashboard-nav>
     <main>
-        <div class="container">
-            <!-- component matched by the route will render here -->
-            <router-view></router-view>
-        </div>
+        <!-- component matched by the route will render here -->
+        <router-view></router-view>
     </main>
+    <dashboard-footer></dashboard-footer>
 </div>
 {% endblock %}
+
