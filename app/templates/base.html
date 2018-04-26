@@ -27,6 +27,7 @@
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/vue.js') }}"></script>
+    <script> const token = "{{ csrf_token() }}"  ;</script>
     <script src="{{ url_for('static', filename='js/vue-router.js') }}"></script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     <script>
