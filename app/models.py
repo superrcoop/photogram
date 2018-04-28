@@ -3,15 +3,22 @@ from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 from bcrypt import hashpw, gensalt
 from . import db ,UPLOAD_FOLDER
 
+def get_newlike_id():
+    return int(str(uuid.uuid4().int)[:8])
+
+def get_newpost_id():
+    return str(uuid.uuid4())[:6]
 
 def get_new_id():
-	new_id = long(time())
-	return new_id
+    return int(str(uuid.uuid4().int)[:8])
+
 
 def get_date():
     return datetime.datetime.now().today()
 
-def generate_file_URI():
+def generate_file_URI(id=None):
+    if id:      
+        URI=UPLOAD_FOLDER+'/posts'+id
     URI=UPLOAD_FOLDER+'/'+str(uuid.uuid4().get_hex()[0:12])+'/'
     if not os.path.exists(URI):
         try:
@@ -20,7 +27,6 @@ def generate_file_URI():
             if e.errno != errno.EEXIST:
                 raise
     return URI
-
 
 class Users(db.Model):
     __tablename__ = 'users'
@@ -48,7 +54,7 @@ class Users(db.Model):
         self.email = email
         self.location=location
         self.biography=biography
-        self.profile_photo=generate_file_URI()+profile_photo
+        self.file_URI=generate_file_URI()+profile_photo
         self.joined_on=get_date()
 
 	@hybrid_property
@@ -79,25 +85,26 @@ class Users(db.Model):
             return str(self.id)  # python 3 support
 
     def __repr__(self):
-		return '<User %r>' % (self.username)
+		return '<Users %r>' % (self.username)
         
 class Posts(db.Model):
     __tablename__ = 'posts'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(10), primary_key=True)
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'),nullable=False)
-    photo = db.Column(db.String(80),nullable=False)
+    post_URI = db.Column(db.String(80),nullable=False)
     caption = db.Column(db.String(120))
     created_on =db.Column(db.Date,nullable=False)
     likes=db.relationship("Likes",backref='posts')
 
     def __init__(self,user_id,photo,caption):
+        self.id=get_newpost_id()
         self.user_id=user_id
-        self.photo= photo #get_file_URI()
+        self.post_URI= generate_file_URI(user_id)
         self.caption=caption
         self.created_on=get_date()
 
     def __repr__(self):
-		return '<Post id: %r>' % (self.id)
+		return '<Posts %r>' % (self.id)
 
 
 class Likes(db.Model):
@@ -107,6 +114,7 @@ class Likes(db.Model):
     post_id = db.Column(db.Integer,db.ForeignKey('posts.id'),nullable=False)
 
     def __init__(self,user_id,post_id):
+        id=get_newlike_id()
         self.user_id=user_id
         self.post_id=post_id
 
@@ -118,6 +126,7 @@ class Follows(db.Model):
     follower_id = db.Column(db.Integer,db.ForeignKey('users.id'),nullable=False)
 
     def __init__(self,user_id,follower_id):
+        id=get_new_id()
         self.user_id=user_id
         self.follower_id=follower_id
 

@@ -1,5 +1,6 @@
 from .models import Users
 import os 
+from .forms import ALLOWED_EXTENSIONS
 
 # Here we define a function to collect form errors from Flask-WTF
 # which we can later use

@@ -2,7 +2,7 @@
 Vue.component('app-header', {
     template: `
         <div class="container">
-          <div class="flux">Photogram </div>
+          <div class="flux"><router-link class="flux" to="/">Photogram</router-link></div>
         </div>
     `
 });
@@ -18,31 +18,37 @@ Vue.component('app-footer', {
 });
 const Register = Vue.component('registration',{
   template:`
-      <form id="registerform" @submit.prevent="registerform" method="POST" enctype="multipart/form-data">
+  <div class="agile_ihj">
+      <form id="registerform" @submit.prevent="registerform" method="POST" enctype="multipart/form-data" novalidate="true">
       <h2>Join Photogram today</h2>
-      <div class="agile_ihj">
+      <p v-if="errors.length">
+    <b>Please correct the following error(s):</b>
+    <ul>
+      <li v-for="error in errors">{{ error }}</li>
+    </ul>
+  </p>
+      
         <div class="agileinfo">
-          <input type="text" name="fname" placeholder="First Name" required="">
+          <input type="text" name="first_name" v-model="first_name" id="fname" placeholder="First Name" >
         </div>
         <div class="agileinfo">
-          <input type="text" name="lname" placeholder="Last Name" required="">
+          <input type="text" name="last_name" v-model="last_name" id="lname" placeholder="Last Name">
         </div>
         <div class="agileinfo">
-          <input type="text" name="username" placeholder="Username" required="">
+          <input type="text" name="username" v-model="username" id="username" placeholder="Username" >
         </div>
         <div class="agileinfo">
-          <input type="email" name="email" placeholder="Email" required="">
+          <input type="email" name="email" v-model="email" id="email" placeholder="Email" >
         </div>
         <div class="agileinfo">
-          <input type="Password" name="plain_password" placeholder="Password" required="">
+          <input type="Password" name="plain_password" v-model="plain_password" id="plain_password" placeholder="Password" >
         </div>
         <div class="agileinfo">
-          <input type="password" name="conf_password" placeholder="Confirm Password" required="">
+          <input type="password" name="conf_password" v-model="conf_password" id="conf_password" placeholder="Confirm Password" >
         </div>
         <div class="agileinfo">
-          <input type="text" name="location" placeholder="Location" required="">
+          <input type="text" name="location" v-model="location" id="location" placeholder="Location" >
         </div>
-</div>
         <div class="agile_par">
           <p>Already had an Account please <router-link to="/login">Login</router-link></p>
         </div>
@@ -52,30 +58,37 @@ const Register = Vue.component('registration',{
       </form>
       
       <div class="clear"></div>
+    </div>
 
 `,
   data: function(){
     return{
       errors:[],
-      username:'',
-      fname:'',
-      lname:'',
-      email:'',
-      plain_password:'',
-      conf_password:'',
-      location:''
+      username:null,
+      first_name:null,
+      last_name:null,
+      email:null,
+      plain_password:null,
+      conf_password:null,
+      location:null
     }
   },
   methods: {
-    uploadform:function(e) {
-      e.preventDefault();
+    checkForm:function(e) {
+      if(this.first_name && this.last_name && this.location && this.email && this.plain_password && this.conf_password){return true;} 
       this.errors = [];
-      if(!this.fname){this.errors.push("First name required.");}
-      if(!this.lname){this.errors.push("Last name required.");}
+      if(!this.first_name){this.errors.push("First name required.");}
+      if(!this.last_name){this.errors.push("Last name required.");}
       if(!this.email){this.errors.push("Email required.");}
       if(!this.plain_password){this.errors.push("Password required.");}
       if(!this.conf_password){this.errors.push("Confirm your password");}
       if(!this.location){this.errors.push("Location required.");}
+      e.preventDefault();
+    },
+    registerform:function(e) {
+      e.preventDefault();
+      this.errors = [];
+      
       
       let uploadForm = document.getElementById('registerform');
       let form_data = new FormData(uploadForm);
@@ -90,6 +103,7 @@ const Register = Vue.component('registration',{
         .then(function (response) {
           if (!response.ok) {
     throw Error(response.statusText);
+            this.errors.push(response.error);
   }
      return response.json();
         })
@@ -110,11 +124,42 @@ const Register = Vue.component('registration',{
     }
 });
 
+const Home = Vue.component('home',{
+  template:`
+      
+      <div class="agile_ihj">
+        <div class="w3l_but">
+          <router-link class="w3l_but" to="/login"><button>Login</button></router-link>
+        </div>
+        <div class="agile_par">
+          <h2>or</h2>
+        </div>
+        <div class="w3l_but">
+          <router-link class="w3l_but" to="/register"><button>Register Now</button></router-link>
+        </div>
+      
+      <div class="clear"></div>
+      </div>
+
+`,
+  data: function(){
+    return{
+    }
+  }
+});
+
 const Login = Vue.component('login',{
   template:`
+  <div class="agile_ihj">
       <form id="loginform" @submit.prevent="loginform" method="POST" enctype="multipart/form-data" >
       <h2>Log in to Photogram</h2>
-      <div class="agile_ihj">
+      <p v-if="errors.length">
+    <b>Please correct the following error(s):</b>
+    <ul>
+      <li v-for="error in errors">{{ error }}</li>
+    </ul>
+    </p>
+      
         <div class="agileinfo">
           <input type="text" name="username" placeholder="Username" required="">
         </div>
@@ -130,6 +175,7 @@ const Login = Vue.component('login',{
       </form>
       
       <div class="clear"></div>
+      </div>
 `,
  data:function(){
   return {
@@ -182,13 +228,69 @@ const Login = Vue.component('login',{
 // Define Routes
 const router = new VueRouter({
     routes: [
-        { path: "/", component: Register },
-        { path: "/api/auth/login", component : Login}
+    { path: "/", component: Home },
+        { path: "/register", component: Register },
+        { path: "/login", component : Login}
     ]
 });
 
 // Instantiate our main Vue Instance
 let app = new Vue({
     el: "#app",
-    router
+    router,
+    data: {
+      result: 'The result will appear here.',
+      token:''
+    },
+    // Usually the generation of a JWT will be done when a user either registers
+        // with your web application or when they login.
+        getToken: function () {
+            let self = this;
+
+            fetch('/token')
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (response) {
+                    let jwt_token = response.data.token;
+
+                    // We store this token in localStorage so that subsequent API requests
+                    // can use the token until it expires or is deleted.
+                    localStorage.setItem('token', jwt_token);
+                    console.info('Token generated and added to localStorage.');
+                    self.token = jwt_token;
+                })
+        },
+        getSecure: function () {
+            let self = this;
+            fetch('/api/secure', {
+                'headers': {
+                    // Try it with the `Basic` schema and you will see it gives an error message.
+                    // 'Authorization': 'Basic ' + localStorage.getItem('token')
+
+                    // JWT requires the Authorization schema to be `Bearer` instead of `Basic`
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            })
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (response) {
+                    let alert = document.querySelector('.alert');
+                    alert.classList.remove('alert-info', 'alert-danger');
+                    alert.classList.add('alert-success');
+
+                    let result = response.data;
+                    // successful response
+                    self.result = `Congrats! You have now made a successful request with a JSON Web Token. Name is: ${result.user.name}.`;
+                })
+                .catch(function (error) {
+                    let alert = document.querySelector('.alert');
+                    alert.classList.remove('alert-info');
+                    alert.classList.add('alert-danger');
+
+                    // unsuccessful response (ie. there was an error)
+                    self.result = `There was an error. ${error.description}`;
+                })
+        }
 });

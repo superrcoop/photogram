@@ -19,6 +19,8 @@ app.config['SECRET_KEY'] = 'pH0t 0Gr@l^l'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] 	= True
+app.config['TOKEN_SECRET'] = 't0k3ns3cr3+'
+
 
 conn = psycopg2.connect(DATABASE_URL)
 db = SQLAlchemy(app)

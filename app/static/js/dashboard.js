@@ -1,39 +1,42 @@
 
 Vue.component('dashboard-settings-modal', {
     template: `
-    <script type="text/x-template" id="modal-template">
-  <transition name="modal">
-    <div class="modal-mask">
-      <div class="modal-wrapper">
-        <div class="modal-container">
-
-          <div class="modal-header">
-            <slot name="header">
-              default header
-            </slot>
-          </div>
-
-          <div class="modal-body">
-            <slot name="body">
-              default body
-            </slot>
-          </div>
-
-          <div class="modal-footer">
-            <slot name="footer">
-              default footer
-              <button class="modal-default-button" @click="$emit('close')">
-                OK
-              </button>
-            </slot>
-          </div>
+    <div id="tokenModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Generated Token</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Your Generated JSON Web Token is:</p>
+                    <figure class="highlight"><span class="jwt-token">{{ token }}</span></figure>
+                    <p>This token was generated with the secret "<strong>some-secret</strong>" and the following payload
+                        data:</p>
+                    <pre>
+                <code>
+    {
+      'sub': '12345',
+      'name': 'John Doe'
+    }</code>
+                </pre>
+                    <p><span class="badge badge-danger">Note:</span> Usually the generation of a JWT will be done when a
+                        user either registers a new account on your web application or when they login.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </transition>
-</script>
-
-    `
+    `,
+    data:function(){
+      return{
+        token:''
+      }
+    }
 });
 
 Vue.component('dashboard-header', {
@@ -48,9 +51,7 @@ Vue.component('dashboard-header', {
                 <div class="stats_agile mb-5">
               <img src="../images/aan.png" alt="Avatar" class="avatar">
               <h3 class="stat-title text-uppercase">Jodn Doe</h3>
-              <button id="show-modal" @click="showModal = true"> <i class="fas fa-cog"></i></button>
-              <dashboard-settings-modal v-if="showModal" @close="showModal = false"></dashboard-settings-modal>
-
+              <button id="show-modal" @click="<function>" data-toggle="modal" data-target="#tokenModal"> <i class="fas fa-cog"></i></button>
               <span class="w3-line"></span>
               <p class="mt-3">Donec consequat sapien ut leo cursus rhoncus. Nullam dui mi, vulputate ac metus at, semper varius orci. Nulla accumsan
                 ac elit in congue. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</p>
@@ -86,8 +87,6 @@ Vue.component('dashboard-header', {
     `,
     data:function(){
       return{
-
-    showModal: false
   
       }
     }
@@ -165,6 +164,12 @@ const Upload = Vue.component('upload', {
    template: `
     <section class="wthree-row py-sm-5 py-3">
       <div class="container py-md-5">
+      <p v-if="errors.length">
+    <b>Please correct the following error(s):</b>
+    <ul>
+      <li v-for="error in errors">{{ error }}</li>
+    </ul>
+    </p>
         <div class="row py-lg-5 pt-md-5 pt-3 d-flex justify-content-center">
         
       </div>
@@ -173,7 +178,9 @@ const Upload = Vue.component('upload', {
     </section>
    `,
     data: function() {
-       return {}
+       return {
+        errors:[]
+       }
     }
 });
 
@@ -240,5 +247,51 @@ const router = new VueRouter({
 // Instantiate our main Vue Instance
 let dashboard = new Vue({
     el: "#photogram",
-    router
+    router,
+    data:{
+      result:'Jwt result will appear here.',
+    },
+    methods: {
+        
+        // Remove token stored in localStorage.
+        // Usually you will remove it when a user logs out of your web application
+        // or if the token has expired.
+        removeToken: function () {
+            localStorage.removeItem('token');
+            console.info('Token removed from localStorage.');
+            alert('Token removed!');    
+        },
+        getSecure: function () {
+            let self = this;
+            fetch('/api/secure', {
+                'headers': {
+                    // Try it with the `Basic` schema and you will see it gives an error message.
+                    // 'Authorization': 'Basic ' + localStorage.getItem('token')
+
+                    // JWT requires the Authorization schema to be `Bearer` instead of `Basic`
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            })
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (response) {
+                    let alert = document.querySelector('.alert');
+                    alert.classList.remove('alert-info', 'alert-danger');
+                    alert.classList.add('alert-success');
+
+                    let result = response.data;
+                    // successful response
+                    self.result = `Congrats! You have now made a successful request with a JSON Web Token. Name is: ${result.user.name}.`;
+                })
+                .catch(function (error) {
+                    let alert = document.querySelector('.alert');
+                    alert.classList.remove('alert-info');
+                    alert.classList.add('alert-danger');
+
+                    // unsuccessful response (ie. there was an error)
+                    self.result = `There was an error. ${error.description}`;
+                })
+        }
+    }
 });
