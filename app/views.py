@@ -104,12 +104,6 @@ def login():
         return jsonify({'errors':form_errors(form)})
 """
 
-
-@app.route('/api/auth/logout', methods = ['GET'])
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
-
 @app.route('/api/users/<user_id>/new', methods = ['POST'])
 def newPost(user_id):
     error=None
@@ -135,27 +129,47 @@ def newPost(user_id):
 @app.route('/api/users/<user_id>/posts', methods = ['GET'])
 def userPosts(user_id):
 
-@app.route('/api/users/<user_id>/follow', methods = ['POST'])
+@app.route('/api/posts', methods = ['GET'])
+def allPosts():
+    posts=Posts.query.order_by(Posts.created_on).all()
+    return jsonify({'posts': add array function})
+
+@app.route('/api/auth/logout', methods = ['GET'])
+@login_required
+@requires_auth
+def userLogout():
+    g.current_user = None
+    logout_user()
+    return jsonify(response=[{'message': 'You have successfully logged out'}])    
+
+@login_manager.user_loader
+def load_user(id):
+   return Users.query.get(int(id))
+
+@app.route('/api/users/<int:user_id>/follow', methods = ['POST'])
+@requires_auth
 def userFollow(user_id):
     if request.method == 'POST':
         userfollow=Follows(user_id,current_user.id)
         db.session.add(userfollow)
         db.session.commit()
         user=Users.query.filter_by(id=user_id).first()
+        return jsonify(response = [{'message':'Now following'+user.username}])
 
 
-@app.route('/api/posts', methods = ['GET'])
-def allPosts():
-    posts=Posts.query.order_by(Posts.created_on).all()
-
-
-@app.route('/api/posts/<int:post_id>/like', methods = ['POST'])
-def userLike(post_id):          
-    if request.method == 'POST':            
+@app.route('/api/posts/<int:post_id>/like', methods =['POST'])
+@requires_auth
+def userLike(post_id):
+    if request.method == 'POST':
         userlike=Likes(post_id,current_user.id)
         db.session.add(userlike)
         db.session.commit()
+
         # add count function
+        def countlikes(post_id):
+            count=Likes.query.filter_by(post_id=post_id).all()
+            return len(count)
+        return jsonify(response= [{'message':'Liked','Likes':count}])
 
 """
 @app.route('/<file_name>.txt')
