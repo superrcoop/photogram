@@ -8,38 +8,41 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    {% block title %} {% endblock %}
+    {% block title %}{% endblock%}
 
     <!-- Bootstrap -->
     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    <link href="https://fonts.googleapis.com/css?family=Pacifico" rel="stylesheet">
+
      <link rel="stylesheet" href="{{ url_for('static', filename='css/photogram.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
+    <!-- titles -->
+    <link href="https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:200,300,400,700" rel="stylesheet">
+    <!-- body -->
+    <link href="https://fonts.googleapis.com/css?family=PT+Sans:400,400i,700,700i" rel="stylesheet">
     {% block css %} {% endblock%}
   </head>
   <body>
-    <div id="main">
+    <div id="page-wrapper">
         {% block main %}{% endblock %}
+        <!-- //login and register modal -->
+        
     </div>
+
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" ></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/vue.js') }}"></script>
-    <script> const token = "{{ csrf_token() }}"  ;</script>
     <script src="{{ url_for('static', filename='js/vue-router.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
-    <script>
+    <script> const token = "{{ csrf_token() }}"  ;</script>
+    <script src="{{ url_for('static', filename='js/counter.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/SmoothScroll.min.js') }}"></script>
 
-    var ul = $('#upload ul');
-
-    $('#drop a').click(function(){
-        // Simulate a click on the file input button
-        // to show the file browser dialog
-        $(this).parent().find('input').click();
-    });
-</script>
     {% block js %} {% endblock%}
   </body>
 </html>
