@@ -57,6 +57,7 @@ def index():
     return render_template('index.html')
 
 @app.route('/dashboard')
+#@requires_auth
 def dashboard():
     """Render website's initial page and let VueJS take over."""
     return render_template('feed.html')
@@ -73,12 +74,13 @@ def register():
         last_name = form.last_name.data
         email = form.email.data
         location = form.location.data
-        if not Users.query.filter_by(email = email).first() and not User.query.filter_by(username = username).first():
-            user = Users(username = username, first_name = first_name, last_name = last_name, email = email, plain_password = password,location=location)
-            db.session.add(user)
-            db.session.commit()
-            flash('You have successfully registered')
-            return redirect(next_page or url_for('login'))
+        if not Users.query.filter_by(email = email).first() and not Users.query.filter_by(user_name = username).first():
+            user = Users(user_name = username, first_name = first_name, last_name = last_name, email = email, plain_password = plain_password,location=location)
+            #db.session.add(user)
+            #db.session.commit()
+            session['username']=username
+            session['password']=plain_password
+            return jsonify(data={"user": username,"password":plain_password,'session':session['username']})
         else:
             error = "Email and/or username already exists"
             return jsonify({'errors': error})
@@ -92,12 +94,15 @@ def login():
     if request.method == 'POST' and form.validate_on_submit():
         username = form.username.data
         password = form.password.data
-        user = Users.query.filter_by(username = username).first()
+        user = Users.query.filter_by(user_name = username).first()
         if user and user.is_correct_password(password): 
             login_user(user)
-            next_page = request.args.get('next')
-            return redirect(next_page or url_for('dashboard'))
-        else: 
+            payload = {'id': user.id, 'username': user.username}
+            token = jwt.encode(payload, app.config['TOKEN_SECRET'], algorithm='HS256') 
+            userdata = [user.username,user.first_name,user.last_name,token]
+            return jsonify(data={'user-credentials': userdata}, message="Token Generated")
+
+        else:
             error = "Invalid email and/or password"
             return jsonify({'errors': error})
     else:

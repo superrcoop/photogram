@@ -104,7 +104,7 @@ const Register = Vue.component('registration',{
         .then(function (response) {
           if (!response.ok) {
     throw Error(response.statusText);
-    
+
             this.errors.push(response.error);
   }
      return response.json();
@@ -192,7 +192,7 @@ const Login = Vue.component('login',{
       this.errors = [];
       if(!this.username){this.errors.push("Name required.");}
       if(!this.password){this.errors.push("Password required.");}
-      
+      let self=this;
       let loginForm = document.getElementById('loginform');
       let form_data = new FormData(loginForm);
       fetch('/api/auth/login', {
@@ -206,6 +206,7 @@ const Login = Vue.component('login',{
         .then(function (response) {
           if (!response.ok) {
     throw Error(response.statusText);
+
   }
      return response.json();
         })
@@ -213,9 +214,10 @@ const Login = Vue.component('login',{
           if(jsonResponse.error) {
             this.errors.push(jsonResponse.error);
           }else{
-            alert("Successfully uploaded");
+            alert("Success");
 
           console.log(jsonResponse);
+          self.$router.push('/dashboard')
           }
           
       })
@@ -241,58 +243,6 @@ let app = new Vue({
     el: "#app",
     router,
     data: {
-      result: 'The result will appear here.',
       token:''
-    },
-    // Usually the generation of a JWT will be done when a user either registers
-        // with your web application or when they login.
-        getToken: function () {
-            let self = this;
-
-            fetch('/token')
-                .then(function (response) {
-                    return response.json();
-                })
-                .then(function (response) {
-                    let jwt_token = response.data.token;
-
-                    // We store this token in localStorage so that subsequent API requests
-                    // can use the token until it expires or is deleted.
-                    localStorage.setItem('token', jwt_token);
-                    console.info('Token generated and added to localStorage.');
-                    self.token = jwt_token;
-                })
-        },
-        getSecure: function () {
-            let self = this;
-            fetch('/api/secure', {
-                'headers': {
-                    // Try it with the `Basic` schema and you will see it gives an error message.
-                    // 'Authorization': 'Basic ' + localStorage.getItem('token')
-
-                    // JWT requires the Authorization schema to be `Bearer` instead of `Basic`
-                    'Authorization': 'Bearer ' + localStorage.getItem('token')
-                }
-            })
-                .then(function (response) {
-                    return response.json();
-                })
-                .then(function (response) {
-                    let alert = document.querySelector('.alert');
-                    alert.classList.remove('alert-info', 'alert-danger');
-                    alert.classList.add('alert-success');
-
-                    let result = response.data;
-                    // successful response
-                    self.result = `Congrats! You have now made a successful request with a JSON Web Token. Name is: ${result.user.name}.`;
-                })
-                .catch(function (error) {
-                    let alert = document.querySelector('.alert');
-                    alert.classList.remove('alert-info');
-                    alert.classList.add('alert-danger');
-
-                    // unsuccessful response (ie. there was an error)
-                    self.result = `There was an error. ${error.description}`;
-                })
-        }
+    }
 });

@@ -37,15 +37,14 @@ class Users(db.Model):
     last_name = db.Column(db.String(80))
     email= db.Column(db.String(80),unique=True,nullable=False)
     location=db.Column(db.String(80))
-    biography = db.Column(db.String(255)) 
+    biography = db.Column(db.String(300)) 
     profile_photo=db.Column(db.String(80))
     joined_on = db.Column(db.Date,nullable=False)
     posts=db.relationship("Posts",backref='users')
     userposts=db.relationship("Likes",backref='users')
     follows=db.relationship("Follows",backref='users')
-    follower=db.relationship("Follows",backref='users')
 
-    def __init__(self,user_name,plain_password,first_name,last_name,email,location,biography):
+    def __init__(self,user_name,plain_password,first_name,last_name,email,location):
         self.id=get_new_id()
         self.user_name = user_name
         self.password = plain_password
@@ -53,8 +52,7 @@ class Users(db.Model):
         self.last_name = last_name
         self.email = email
         self.location=location
-        self.biography=biography
-        self.file_URI=generate_file_URI()+profile_photo
+        self.file_URI=generate_file_URI()
         self.joined_on=get_date()
 
 	@hybrid_property
@@ -111,7 +109,7 @@ class Likes(db.Model):
     __tablename__ = 'likes'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'),nullable=False)
-    post_id = db.Column(db.Integer,db.ForeignKey('posts.id'),nullable=False)
+    post_id = db.Column(db.String(10),db.ForeignKey('posts.id'),nullable=False)
 
     def __init__(self,user_id,post_id):
         id=get_newlike_id()
@@ -122,7 +120,7 @@ class Likes(db.Model):
 class Follows(db.Model):
     __tablename__ = 'follows'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer,db.ForeignKey('users.id'),nullable=False)
+    user_id = db.Column(db.Integer,nullable=False)
     follower_id = db.Column(db.Integer,db.ForeignKey('users.id'),nullable=False)
 
     def __init__(self,user_id,follower_id):
