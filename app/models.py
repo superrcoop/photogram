@@ -38,14 +38,14 @@ class Users(db.Model):
     email= db.Column(db.String(80),unique=True,nullable=False)
     location=db.Column(db.String(80))
     biography = db.Column(db.String(255)) 
-    profile_photo=db.Column(db.String(80),nullable=False)
+    profile_photo=db.Column(db.String(80))
     joined_on = db.Column(db.Date,nullable=False)
     posts=db.relationship("Posts",backref='users')
     userposts=db.relationship("Likes",backref='users')
     follows=db.relationship("Follows",backref='users')
     follower=db.relationship("Follows",backref='users')
 
-    def __init__(self,user_name,plain_password,first_name,last_name,email,location,biography,profile_photo):
+    def __init__(self,user_name,plain_password,first_name,last_name,email,location,biography):
         self.id=get_new_id()
         self.user_name = user_name
         self.password = plain_password

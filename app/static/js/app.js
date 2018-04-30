@@ -27,6 +27,7 @@ const Register = Vue.component('registration',{
       <li v-for="error in errors">{{ error }}</li>
     </ul>
   </p>
+
       
         <div class="agileinfo">
           <input type="text" name="first_name" v-model="first_name" id="fname" placeholder="First Name" >
@@ -103,6 +104,7 @@ const Register = Vue.component('registration',{
         .then(function (response) {
           if (!response.ok) {
     throw Error(response.statusText);
+    
             this.errors.push(response.error);
   }
      return response.json();

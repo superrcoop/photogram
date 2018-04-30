@@ -5,7 +5,7 @@ Werkzeug Documentation:  http://werkzeug.pocoo.org/documentation/
 """
 
 from app import app, db, login_manager 
-from flask import render_template, request, session, redirect, url_for ,jsonify,g,_request_ctx_stack
+from flask import render_template, request, session, redirect, url_for ,jsonify,g,_request_ctx_stack,flash
 from controllers import form_errors , allowed_file
 from flask_login import login_user, logout_user, current_user, login_required
 from forms import LoginForm, RegistrationForm, PostsForm
@@ -77,7 +77,7 @@ def register():
             user = Users(username = username, first_name = first_name, last_name = last_name, email = email, plain_password = password,location=location)
             db.session.add(user)
             db.session.commit()
-            #flash success message
+            flash('You have successfully registered')
             return redirect(next_page or url_for('login'))
         else:
             error = "Email and/or username already exists"
@@ -197,7 +197,7 @@ def page_not_found(error):
     return render_template('404.html'), 404
 
 @app.errorhandler(500)
-def page_not_found(error):
+def internal_server_error(error):
     """Custom 500 page."""
     return render_template('500.html'), 500
 
