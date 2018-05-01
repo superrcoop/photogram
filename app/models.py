@@ -57,7 +57,7 @@ class Users(db.Model,UserMixin):
         self.joined_on=get_date()
     
     def is_correct_password(self, plain_password):
-		return checkpw(plain_password.encode('utf-8'),self.password)
+		return checkpw(plain_password.encode('utf-8'),self.password.encode('utf-8'))
 
     def is_authenticated(self):
         return True

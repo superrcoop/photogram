@@ -111,9 +111,8 @@ const Register = Vue.component('registration',{
           if(jsonResponse.errors) {
             console.log(jsonResponse.errors);
             self.errors.push(jsonResponse.errors);
-
           }else{
-            
+
           console.log(jsonResponse.data);
            console.log(jsonResponse.message); 
           self.$router.push('/login')
@@ -223,8 +222,8 @@ const Login = Vue.component('login',{
             self.errors.push(jsonResponse.errors);
           }else{
           console.log(jsonResponse);
-          let token = jsonResponse.data.userdata[3]
-          let username=jsonResponse.data.userdata[0]
+          let token = jsonResponse.data.user_credentials[3];
+          let username=jsonResponse.data.user_credentials[0];
           localStorage.setItem('jwt_token', token);
           localStorage.setItem('username',username);
           window.location = "/dashboard";

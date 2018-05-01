@@ -91,7 +91,7 @@ def register():
             db.session.commit()
             return jsonify(data={"user": username,"password":plain_password},message="You have successfully registered")
         else:
-            error = ["Email and/or username already exists"]
+            error = "Email and/or username already exists"
             return jsonify({'errors': error})
     else:
         return jsonify({'errors':form_errors(form)})
@@ -112,7 +112,7 @@ def login():
             """
             next_page = request.args.get('next')
             return redirect(next_page or url_for('dashboard'))"""
-            return jsonify(data={'user-credentials': userdata}, message="Token Generated")
+            return jsonify(data={'user_credentials': userdata}, message="Token Generated")
         else:
             error = "Invalid email and/or password"
             return jsonify({'errors': error})
