@@ -38,7 +38,7 @@ def requires_auth(f):
 
     token = parts[1]
     try:
-         payload = jwt.decode(token, 'some-secret')
+         payload = jwt.decode(token, app.config['TOKEN_SECRET'])
 
     except jwt.ExpiredSignature:
         return jsonify({'code': 'token_expired', 'description': 'token is expired'}), 401
@@ -50,6 +50,9 @@ def requires_auth(f):
 
   return decorated
 
+@login_manager.user_loader
+def load_user(id):
+   return Users.query.get(int(id))
 
 @app.route('/')
 def index():
@@ -57,8 +60,16 @@ def index():
     return render_template('index.html')
 
 @app.route('/dashboard')
-#@requires_auth
+@login_required
 def dashboard():
+    #user = g.current_user
+    """
+    payload = {'id': current_user.id, 'username': current_user.user_name}
+    token = jwt.encode(payload, app.config['TOKEN_SECRET'], algorithm='HS256') 
+    userdata = [current_user.current_user_name,current_user.first_name,current_user.last_name,token]
+    message="Token Generated"
+    """
+
     """Render website's initial page and let VueJS take over."""
     return render_template('feed.html')
 
@@ -76,13 +87,11 @@ def register():
         location = form.location.data
         if not Users.query.filter_by(email = email).first() and not Users.query.filter_by(user_name = username).first():
             user = Users(user_name = username, first_name = first_name, last_name = last_name, email = email, plain_password = plain_password,location=location)
-            #db.session.add(user)
-            #db.session.commit()
-            session['username']=username
-            session['password']=plain_password
-            return jsonify(data={"user": username,"password":plain_password,'session':session['username']})
+            db.session.add(user)
+            db.session.commit()
+            return jsonify(data={"user": username,"password":plain_password},message="You have successfully registered")
         else:
-            error = "Email and/or username already exists"
+            error = ["Email and/or username already exists"]
             return jsonify({'errors': error})
     else:
         return jsonify({'errors':form_errors(form)})
@@ -93,15 +102,17 @@ def login():
     form = LoginForm()
     if request.method == 'POST' and form.validate_on_submit():
         username = form.username.data
-        password = form.password.data
+        plain_password = form.plain_password.data
         user = Users.query.filter_by(user_name = username).first()
-        if user and user.is_correct_password(password): 
+        if user and user.is_correct_password(plain_password): 
             login_user(user)
-            payload = {'id': user.id, 'username': user.username}
+            payload = {'id': current_user.id, 'username': current_user.user_name}
             token = jwt.encode(payload, app.config['TOKEN_SECRET'], algorithm='HS256') 
-            userdata = [user.username,user.first_name,user.last_name,token]
+            userdata = [current_user.user_name,current_user.first_name,current_user.last_name,token]
+            """
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for('dashboard'))"""
             return jsonify(data={'user-credentials': userdata}, message="Token Generated")
-
         else:
             error = "Invalid email and/or password"
             return jsonify({'errors': error})
@@ -110,6 +121,8 @@ def login():
 """
 
 @app.route('/api/users/<user_id>/new', methods = ['POST'])
+@login_required
+@requires_auth
 def newPost(user_id):
     error=None
     form = PostsForm()
@@ -135,6 +148,7 @@ def newPost(user_id):
 def userPosts(user_id):
 
 @app.route('/api/posts', methods = ['GET'])
+@login_required
 def allPosts():
     posts=Posts.query.order_by(Posts.created_on).all()
     return jsonify({'posts': add array function})
@@ -147,11 +161,10 @@ def userLogout():
     logout_user()
     return jsonify(response=[{'message': 'You have successfully logged out'}])    
 
-@login_manager.user_loader
-def load_user(id):
-   return Users.query.get(int(id))
+
 
 @app.route('/api/users/<int:user_id>/follow', methods = ['POST'])
+@login_required
 @requires_auth
 def userFollow(user_id):
     if request.method == 'POST':
@@ -163,6 +176,7 @@ def userFollow(user_id):
 
 
 @app.route('/api/posts/<int:post_id>/like', methods =['POST'])
+@login_required
 @requires_auth
 def userLike(post_id):
     if request.method == 'POST':

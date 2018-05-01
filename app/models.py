@@ -1,7 +1,8 @@
 import uuid , datetime , random , os ,errno
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
-from bcrypt import hashpw, gensalt
+from bcrypt import hashpw, gensalt ,checkpw
 from . import db ,UPLOAD_FOLDER
+from flask_login import UserMixin
 
 def get_newlike_id():
     return int(str(uuid.uuid4().int)[:8])
@@ -28,11 +29,11 @@ def generate_file_URI(id=None):
                 raise
     return URI
 
-class Users(db.Model):
+class Users(db.Model,UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     user_name = db.Column(db.String(80),unique=True)
-    _password = db.Column(db.String(255),nullable=False)
+    password = db.Column(db.String(255),nullable=False)
     first_name = db.Column(db.String(80))
     last_name = db.Column(db.String(80))
     email= db.Column(db.String(80),unique=True,nullable=False)
@@ -47,25 +48,16 @@ class Users(db.Model):
     def __init__(self,user_name,plain_password,first_name,last_name,email,location):
         self.id=get_new_id()
         self.user_name = user_name
-        self.password = plain_password
+        self.password = hashpw(plain_password.encode('utf-8'),gensalt())
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
         self.location=location
         self.file_URI=generate_file_URI()
         self.joined_on=get_date()
-
-	@hybrid_property
-	def password(self):
-		return self._password
-
-	@password.setter
-	def password(self,plain_password):
-		self._password = hashpw(plain_password,gensalt())
- 
-	@hybrid_method
-	def is_correct_password(self, plain_password):
-		return hashpw(plain_password,self.password)==self.password
+    
+    def is_correct_password(self, plain_password):
+		return checkpw(plain_password.encode('utf-8'),self.password)
 
     def is_authenticated(self):
         return True

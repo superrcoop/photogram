@@ -21,7 +21,7 @@ const Register = Vue.component('registration',{
   <div class="agile_ihj">
       <form id="registerform" @submit.prevent="registerform" method="POST" enctype="multipart/form-data" novalidate="true">
       <h2>Join Photogram today</h2>
-      <p v-if="errors.length">
+      <p class="alert alert-danger" role="alert" v-if="errors.length">
     <b>Please correct the following error(s):</b>
     <ul>
       <li v-for="error in errors">{{ error }}</li>
@@ -89,7 +89,7 @@ const Register = Vue.component('registration',{
     registerform:function(e) {
       e.preventDefault();
       this.errors = [];
-      
+      let self=this;
       
       let uploadForm = document.getElementById('registerform');
       let form_data = new FormData(uploadForm);
@@ -104,18 +104,19 @@ const Register = Vue.component('registration',{
         .then(function (response) {
           if (!response.ok) {
     throw Error(response.statusText);
-
-            this.errors.push(response.error);
   }
      return response.json();
         })
         .then(function (jsonResponse) {
-          if(jsonResponse.error) {
-            this.errors.push(jsonResponse.error);
-          }else{
-            alert("Successfully Registered");
+          if(jsonResponse.errors) {
+            console.log(jsonResponse.errors);
+            self.errors.push(jsonResponse.errors);
 
-          console.log(jsonResponse);
+          }else{
+            
+          console.log(jsonResponse.data);
+           console.log(jsonResponse.message); 
+          self.$router.push('/login')
           }
           
       })
@@ -156,17 +157,23 @@ const Login = Vue.component('login',{
       <form id="loginform" @submit.prevent="loginform" method="POST" enctype="multipart/form-data" >
       <h2>Log in to Photogram</h2>
       <p v-if="errors.length">
+    <p class="alert alert-danger" role="alert" v-if="errors.length">
     <b>Please correct the following error(s):</b>
     <ul>
       <li v-for="error in errors">{{ error }}</li>
     </ul>
-    </p>
+  </p>
+  <p class="alert alert-success" role="alert" v-if="messages.length">
+    <ul>
+      <li v-for="message in messages">{{ message }}</li>
+    </ul>
+  </p>
       
-        <div class="agileinfo">
-          <input type="text" name="username" placeholder="Username" required="">
+       <div class="agileinfo">
+          <input type="text" name="username" v-model="username" id="username" placeholder="Username" >
         </div>
-        <div class="agileinfo">
-          <input type="Password" name="password" placeholder="Password" required="">
+       <div class="agileinfo">
+          <input type="Password" name="plain_password" v-model="plain_password" id="plain_password" placeholder="Password" >
         </div>
         <div class="agile_par">
           <p>Dont have an Account? <router-link class="nav-link" to="/register">Register Now</router-link></p>
@@ -182,8 +189,9 @@ const Login = Vue.component('login',{
  data:function(){
   return {
     errors:[],
+    messages:[],
     username:'',
-    password:''
+    plain_password:''
   }
  },
   methods: {
@@ -191,7 +199,7 @@ const Login = Vue.component('login',{
       e.preventDefault();
       this.errors = [];
       if(!this.username){this.errors.push("Name required.");}
-      if(!this.password){this.errors.push("Password required.");}
+      if(!this.plain_password){this.errors.push("Password required.");}
       let self=this;
       let loginForm = document.getElementById('loginform');
       let form_data = new FormData(loginForm);
@@ -211,13 +219,15 @@ const Login = Vue.component('login',{
      return response.json();
         })
         .then(function (jsonResponse) {
-          if(jsonResponse.error) {
-            this.errors.push(jsonResponse.error);
+          if(jsonResponse.errors) {
+            self.errors.push(jsonResponse.errors);
           }else{
-            alert("Success");
-
           console.log(jsonResponse);
-          self.$router.push('/dashboard')
+          let token = jsonResponse.data.userdata[3]
+          let username=jsonResponse.data.userdata[0]
+          localStorage.setItem('jwt_token', token);
+          localStorage.setItem('username',username);
+          window.location = "/dashboard";
           }
           
       })
