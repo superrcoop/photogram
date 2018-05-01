@@ -108,16 +108,23 @@ def login():
             login_user(user)
             payload = {'id': current_user.id, 'username': current_user.user_name}
             token = jwt.encode(payload, app.config['TOKEN_SECRET'], algorithm='HS256') 
-            userdata = [current_user.user_name,current_user.first_name,current_user.last_name,token]
-            """
-            next_page = request.args.get('next')
-            return redirect(next_page or url_for('dashboard'))"""
+            userdata = [current_user.user_name,current_user.first_name,current_user.last_name,current_user.location,current_user.joined_on,token]
             return jsonify(data={'user_credentials': userdata}, message="Token Generated")
         else:
             error = "Invalid email and/or password"
             return jsonify({'errors': error})
     else:
         return jsonify({'errors':form_errors(form)})
+
+@app.route('/api/auth/logout', methods = ['GET'])
+@login_required
+@requires_auth
+def userLogout():
+    g.current_user = None
+    logout_user()
+    return jsonify(response=[{'message': 'You have successfully logged out'}])    
+
+
 """
 
 @app.route('/api/users/<user_id>/new', methods = ['POST'])
@@ -152,14 +159,6 @@ def userPosts(user_id):
 def allPosts():
     posts=Posts.query.order_by(Posts.created_on).all()
     return jsonify({'posts': add array function})
-
-@app.route('/api/auth/logout', methods = ['GET'])
-@login_required
-@requires_auth
-def userLogout():
-    g.current_user = None
-    logout_user()
-    return jsonify(response=[{'message': 'You have successfully logged out'}])    
 
 
 

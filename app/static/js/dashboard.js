@@ -1,57 +1,17 @@
 
-Vue.component('dashboard-settings-modal', {
-    template: `
-    <div id="tokenModal" class="modal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Generated Token</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p>Your Generated JSON Web Token is:</p>
-                    <figure class="highlight"><span class="jwt-token">{{ token }}</span></figure>
-                    <p>This token was generated with the secret "<strong>some-secret</strong>" and the following payload
-                        data:</p>
-                    <pre>
-                <code>
-    {
-      'sub': '12345',
-      'name': 'John Doe'
-    }</code>
-                </pre>
-                    <p><span class="badge badge-danger">Note:</span> Usually the generation of a JWT will be done when a
-                        user either registers a new account on your web application or when they login.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    `,
-    data:function(){
-      return{
-        token:''
-      }
-    }
-});
-
 Vue.component('dashboard-header', {
     template: `
     <section class="agile_stats">
       <div class="container-fluid pt-5">
         <div class="row pt-lg-5 w3-abbottom">
           <div class="col-lg px-sm-5 px-3">
-            <div class="col-md-3 pull-left ">
-                  <img src="../images/Avatar.png" class="img-fluid" alt="image" />
-                </div>
                 <div class="stats_agile mb-5">
-              <img src="../images/aan.png" alt="Avatar" class="avatar">
-              <h3 class="stat-title text-uppercase">Jodn Doe</h3>
-              <button id="show-modal" @click="<function>" data-toggle="modal" data-target="#tokenModal"> <i class="fas fa-cog"></i></button>
+              <img :src="photo" alt="Avatar" class="avatar">
+              <h3 class="stat-title text-uppercase">{{first_name}}{{last_name}}</h3>
+              <p >Date Joined:{{joined_on}}</p>
+              <p >Location: {{location}}</p>
+            
+              <button id="show-modal" @click="logout" > <i class="fas fa-cog"></i> Logout</button>
               <span class="w3-line"></span>
               <p class="mt-3">Donec consequat sapien ut leo cursus rhoncus. Nullam dui mi, vulputate ac metus at, semper varius orci. Nulla accumsan
                 ac elit in congue. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</p>
@@ -87,8 +47,74 @@ Vue.component('dashboard-header', {
     `,
     data:function(){
       return{
-  
+        user_name:'',
+        first_name:'',
+        last_name:'',
+        location:'',
+        photo:'',
+        joined_on:'',
+        posts:'',
+        followers:'',
+        following:''
+        
       }
+    },
+    created: function() {
+        let self = this;
+        if (localStorage.getItem('photo')){
+            self.photo=localStorage.getItem('photo');
+        }else{
+          self.photo="../images/aan.png"
+        };
+          self.user_name=localStorage.getItem('username');
+          self.location=localStorage.getItem('location');
+          self.first_name=localStorage.getItem('firsname');
+          self.last_name=localStorage.getItem('lastname');
+          self.joined_on=localStorage.getItem('date_joined');
+    },
+    methods:{
+      logout: function(){
+        if (localStorage.getItem('jwt_token')!==null){
+            let self = this;
+            self.token=localStorage.getItem('jwt_token');
+            fetch("/api/auth/logout", { 
+                method: 'GET',
+                headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('jwt_token')
+                    },
+                credentials: 'same-origin'
+                
+                })
+                .then(function (response) {
+
+              if (!response.ok) {
+          throw Error(response.statusText);
+
+               };
+              return response.json();
+        })
+        .then(function (jsonResponse) {
+          if(jsonResponse.errors) {
+            self.errors.push(jsonResponse.errors);
+          }else{
+                       localStorage.clear();
+                       self.removeToken();
+                         window.location = "/";
+                    };
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            }
+        },
+        // Remove token stored in localStorage.
+        // Usually you will remove it when a user logs out of your web application
+        // or if the token has expired.
+        removeToken: function () {
+            localStorage.removeItem('jwt_token');
+            console.info('Token removed from localStorage.');
+            alert('Token removed!');  
+            }    
     }
 });
 
@@ -144,19 +170,24 @@ const Timeline = Vue.component('timeline',{
     <section class="wthree-row py-sm-5 py-3">
       <div class="container py-md-5">
       <div class="row py-lg-5 pt-md-5 pt-3 d-flex justify-content-center">
+        <card  v-for="post in posts"
+  v-bind:key="post.id"
+  v-bind:title="post.title"></card>
         <card></card>
-        <card></card>
-        <card></card>
-        <card></card>
-        <card></card>
-        <card></card>
+
       </div>
         
       </div>
     </section>
 `,
  data:function(){
-  return {}
+  return {
+     posts: [
+      { id: 1, title: 'My journey with Vue' },
+      { id: 2, title: 'Blogging with Vue' },
+      { id: 3, title: 'Why Vue is so fun' },
+    ]
+  }
  }
 });
 
@@ -247,51 +278,5 @@ const router = new VueRouter({
 // Instantiate our main Vue Instance
 let dashboard = new Vue({
     el: "#photogram",
-    router,
-    data:{
-      result:'Jwt result will appear here.',
-    },
-    methods: {
-        
-        // Remove token stored in localStorage.
-        // Usually you will remove it when a user logs out of your web application
-        // or if the token has expired.
-        removeToken: function () {
-            localStorage.removeItem('token');
-            console.info('Token removed from localStorage.');
-            alert('Token removed!');    
-        },
-        getSecure: function () {
-            let self = this;
-            fetch('/api/secure', {
-                'headers': {
-                    // Try it with the `Basic` schema and you will see it gives an error message.
-                    // 'Authorization': 'Basic ' + localStorage.getItem('token')
-
-                    // JWT requires the Authorization schema to be `Bearer` instead of `Basic`
-                    'Authorization': 'Bearer ' + localStorage.getItem('token')
-                }
-            })
-                .then(function (response) {
-                    return response.json();
-                })
-                .then(function (response) {
-                    let alert = document.querySelector('.alert');
-                    alert.classList.remove('alert-info', 'alert-danger');
-                    alert.classList.add('alert-success');
-
-                    let result = response.data;
-                    // successful response
-                    self.result = `Congrats! You have now made a successful request with a JSON Web Token. Name is: ${result.user.name}.`;
-                })
-                .catch(function (error) {
-                    let alert = document.querySelector('.alert');
-                    alert.classList.remove('alert-info');
-                    alert.classList.add('alert-danger');
-
-                    // unsuccessful response (ie. there was an error)
-                    self.result = `There was an error. ${error.description}`;
-                })
-        }
-    }
+    router
 });

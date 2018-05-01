@@ -115,8 +115,8 @@ const Register = Vue.component('registration',{
 
           console.log(jsonResponse.data);
            console.log(jsonResponse.message); 
-          self.$router.push('/login')
-          }
+          self.$router.push('/login');
+          };
           
       })
         .catch(function (error) {
@@ -222,10 +222,18 @@ const Login = Vue.component('login',{
             self.errors.push(jsonResponse.errors);
           }else{
           console.log(jsonResponse);
-          let token = jsonResponse.data.user_credentials[3];
+          let token = jsonResponse.data.user_credentials[5];
           let username=jsonResponse.data.user_credentials[0];
+          let location=jsonResponse.data.user_credentials[3];
+          let firstname=jsonResponse.data.user_credentials[1];
+          let lastname=jsonResponse.data.user_credentials[2];
+          let joined_on=jsonResponse.data.user_credentials[4];
           localStorage.setItem('jwt_token', token);
           localStorage.setItem('username',username);
+          localStorage.setItem('location',location);
+          localStorage.setItem('firstname',firstname);
+          localStorage.setItem('lastname',lastname);
+          localStorage.setItem('date_joined',joined_on);
           window.location = "/dashboard";
           }
           
