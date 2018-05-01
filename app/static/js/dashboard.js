@@ -202,7 +202,16 @@ const Upload = Vue.component('upload', {
     </ul>
     </p>
         <div class="row py-lg-5 pt-md-5 pt-3 d-flex justify-content-center">
-        
+        <form id="uploadform"  @submit.prevent="uploadPost" method="POST" enctype="multipart/form-data">
+                <label for="photo">Upload photo</label>
+                <input class="form-control" id="file"  type="file" name="photo"/>
+                <br>
+                <br>
+                <label class="input-group lead" for="caption">Caption</label>
+                <textarea class="form-control" rows="3"  v-model="caption" placeholder="Write a caption..." id="caption" name="caption"></textarea>
+                <br><br>
+                <button class="btn btn-primary" type="submit">Submit</button>
+            </form>
       </div>
 
       </div>
@@ -210,8 +219,45 @@ const Upload = Vue.component('upload', {
    `,
     data: function() {
        return {
-        errors:[]
+        errors:[],
+        caption:'',
+        photo:null
        }
+    },methods: {
+        uploadPost: function () {
+            let self = this;
+            this.errors = [];
+          if(!this.photo){this.errors.push("Photo required.");}
+            let uploadForm = document.getElementById('uploadform');
+            let form_data = new FormData(uploadForm);
+            fetch("/api/"+localStorage.getItem('id')+"/newpost", { 
+            method: 'POST',
+            body: form_data,
+            headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token'),
+                    'X-CSRFToken': token
+                },
+            credentials: 'same-origin'
+            
+            })
+            .then(function (response) {
+              if (!response.ok) {
+    throw Error(response.statusText);
+  }
+                return response.json();
+            })
+            .then(function (jsonResponse) {
+                 if(jsonResponse.error) {
+            this.errors.push(jsonResponse.error);
+          }else{
+            alert("Successfully uploaded");
+            console.log(jsonResponse);
+          }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        }
     }
 });
 

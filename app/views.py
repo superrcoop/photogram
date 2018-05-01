@@ -108,7 +108,7 @@ def login():
             login_user(user)
             payload = {'id': current_user.id, 'username': current_user.user_name}
             token = jwt.encode(payload, app.config['TOKEN_SECRET'], algorithm='HS256') 
-            userdata = [current_user.user_name,current_user.first_name,current_user.last_name,current_user.location,current_user.joined_on,token]
+            userdata = [current_user.user_name,current_user.first_name,current_user.last_name,current_user.location,current_user.joined_on,token,current_user.id]
             return jsonify(data={'user_credentials': userdata}, message="Token Generated")
         else:
             error = "Invalid email and/or password"
@@ -122,12 +122,9 @@ def login():
 def userLogout():
     g.current_user = None
     logout_user()
-    return jsonify(response=[{'message': 'You have successfully logged out'}])    
+    return jsonify(message= 'You have successfully logged out')    
 
-
-"""
-
-@app.route('/api/users/<user_id>/new', methods = ['POST'])
+@app.route('/api/<user_id>/newpost', methods = ['POST'])
 @login_required
 @requires_auth
 def newPost(user_id):
@@ -144,12 +141,14 @@ def newPost(user_id):
             file.save(os.path.join(newpost.post_URI, filename))
             db.session.add(newpost)
             db.session.commit()
+            return jsonify(message="Post successfully")
         else:
             error='File not allowed'
-            flash('File not allowed)
             return jsonify({'errors': error})
     else:
         return jsonify({'errors':form_errors(form)})
+
+"""
 
 @app.route('/api/users/<user_id>/posts', methods = ['GET'])
 def userPosts(user_id):

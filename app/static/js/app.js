@@ -228,12 +228,14 @@ const Login = Vue.component('login',{
           let firstname=jsonResponse.data.user_credentials[1];
           let lastname=jsonResponse.data.user_credentials[2];
           let joined_on=jsonResponse.data.user_credentials[4];
+          let id=jsonResponse.data.user_credentials[6];
           localStorage.setItem('jwt_token', token);
           localStorage.setItem('username',username);
           localStorage.setItem('location',location);
           localStorage.setItem('firstname',firstname);
           localStorage.setItem('lastname',lastname);
           localStorage.setItem('date_joined',joined_on);
+          localStorage.setItem('id',id);
           window.location = "/dashboard";
           }
           
