@@ -64,7 +64,7 @@ Vue.component('dashboard-header', {
         if (localStorage.getItem('photo')){
             self.photo=localStorage.getItem('photo');
         }else{
-          self.photo="../images/aan.png"
+          self.photo="https://img00.deviantart.net/6093/i/2013/104/8/6/the_legend_of_aang__aang_portrait_by_dejakob-d61o0wy.png"
         };
           self.user_name=localStorage.getItem('username');
           self.location=localStorage.getItem('location');
@@ -124,14 +124,13 @@ Vue.component('dashboard-nav', {
     <div class="btn-toolbar justify-content-between" role="toolbar" aria-label="Toolbar with button groups">
   <div class="btn-group" role="group" aria-label="First group">
   <router-link class="btn btn-secondary" to="/upload">Upload</router-link>
-  <router-link class="btn btn-secondary" to="/timeline">Explore(ALL)</router-link>
+  <router-link class="btn btn-secondary" to="/">Explore(ALL)</router-link>
   <router-link class="btn btn-secondary" to="/profile">My Posts</router-link>
   <router-link class="btn btn-secondary" to="/following">Following</router-link>
   <router-link class="btn btn-secondary" to="/likes">Liked</router-link>
   </div>
   <div class="input-group">
-  <button type="button" class="btn btn-secondary input-group-addon" id="btnGroupAddon2">Search</button>
-    <input type="text" class="form-control" placeholder="Search profile,posts,etc.." aria-describedby="btnGroupAddon2">
+  <router-link class="btn btn-secondary" to="/search">Search</router-link>
   </div>
 </div>
     `
@@ -154,28 +153,36 @@ Vue.component('dashboard-footer', {
 
 Vue.component('card', {
     template: `
-    <div class="card col-lg-3 col-md-6 border-0 mt-md-0 mt-5">
-            <img class="card-img-top" src="../images/g3.jpg " alt="Card image cap ">
-            <div class="card-body bg-light text-center">
-              <h5 class="card-title ">custom menus</h5>
-              <p class="card-text mb-3 ">Class aptent taciti sociosqu ad litora torquent per conubia nostra per inceptos himenaeos.</p>
-              <a href="#ab-bot" class="btn scroll">View More</a>
-            </div>
-          </div>
-    `
+   
+          <a href="#">
+                <div class="col-lg-4">
+                    <div class="card">
+                        <img :src="photo" alt="photo">
+                        <h4>{{title}}</h4>
+                        <p><i class="fa fa-calendar"></i> Posted on {{date_post}} by @{{username}}</p>
+                        <p><i class="fa fa-tags"></i> Tags: <a href=""><span class="badge badge-info">Bootstrap</span></a> <a href=""><span class="badge badge-info">Web</span></a> <a href=""><span class="badge badge-info">CSS</span></a> <a href=""><span class="badge badge-info">HTML</span></a></p>
+        
+                        <p>{{caption}}</p>
+                        <p><i class="far fa-thumbs-up"></i>{{likes}}</p>
+                    </div>
+                </div>
+            </a>
+    `,props:['id','title','username','likes','date_post','tags','caption',"photo"]
 });
 
 const Timeline = Vue.component('timeline',{
   template:`
     <section class="wthree-row py-sm-5 py-3">
       <div class="container py-md-5">
-      <div class="row py-lg-5 pt-md-5 pt-3 d-flex justify-content-center">
         <card  v-for="post in posts"
   v-bind:key="post.id"
-  v-bind:title="post.title"></card>
-        <card></card>
+  v-bind:title="post.title" 
+  v-bind:caption="post.caption"
+  v-bind:likes="post.likes"
+  v-bind:date_post="post.date_post"
+  v-bind:photo="post.photo"
+  v-bind:username="post.username"></card>
 
-      </div>
         
       </div>
     </section>
@@ -183,9 +190,9 @@ const Timeline = Vue.component('timeline',{
  data:function(){
   return {
      posts: [
-      { id: 1, title: 'My journey with Vue' },
-      { id: 2, title: 'Blogging with Vue' },
-      { id: 3, title: 'Why Vue is so fun' },
+      { id: 1, title: 'My journey with Vue',caption:'It is so easy',likes:58,date_post:'Feb 2018',photo:'https://vuejs.org/images/logo.png' ,username:'__me__'},
+      { id: 2, title: 'Blogging with Vue',caption:'-No caption-',likes:79,date_post:'Apr 2018',photo:'https://www.hover.com/blog/wp-content/uploads/2014/04/blog-button.png' ,username:'__me__'},
+      { id: 3, title: 'Why Vue is so fun',caption:'You just plug and go',likes:79,date_post:'Mar 2018',photo:'https://react-etc.net/files/2015-11/danguu.jpg' ,username:'__me__'} 
     ]
   }
  }
@@ -265,16 +272,53 @@ const Likes = Vue.component('likes', {
    template: `
     <section class="wthree-row py-sm-5 py-3">
       <div class="container py-md-5">
-        <div class="row py-lg-5 pt-md-5 pt-3 d-flex justify-content-center">
-        <card></card>
-        <card></card>
+        <div class="justify-content-center">
+        <card  v-for="post in posts"
+  v-bind:key="post.id"
+  v-bind:title="post.title" 
+  v-bind:caption="post.caption"
+  v-bind:likes="post.likes"
+  v-bind:date_post="post.date_post"
+  v-bind:photo="post.photo"
+  v-bind:username="post.username"></card>
       </div>
 
       </div>
     </section>
    `,
     data: function() {
-       return {}
+       return {
+         posts: [
+      { id: 1, title: 'My journey with Vue',caption:'It is so easy',likes:58,date_post:'Feb 2018',photo:'https://vuejs.org/images/logo.png' ,username:'__me__'}
+      ]
+       }
+    }
+});
+
+const Following = Vue.component('following', {
+   template: `
+    <section class="wthree-row py-sm-5 py-3">
+      <div class="container py-md-5">
+        <div class="justify-content-center">
+        <card  v-for="post in posts"
+  v-bind:key="post.id"
+  v-bind:title="post.title" 
+  v-bind:caption="post.caption"
+  v-bind:likes="post.likes"
+  v-bind:date_post="post.date_post"
+  v-bind:photo="post.photo"
+  v-bind:username="post.username"></card>
+      </div>
+
+      </div>
+    </section>
+   `,
+    data: function() {
+       return {
+         posts: [
+      { id: 1, title: 'My journey with Vue',caption:'It is so easy',likes:58,date_post:'Feb 2018',photo:'https://vuejs.org/images/logo.png' ,username:'__me__'}
+      ]
+       }
     }
 });
 
@@ -282,17 +326,26 @@ const Profile = Vue.component('profile', {
    template: `
     <section class="wthree-row py-sm-5 py-3">
       <div class="container py-md-5">
-        <div class="row py-lg-5 pt-md-5 pt-3 d-flex justify-content-center">
-        <card></card>
-        <card></card>
-        <card></card>
-        <card></card>
+        <div class="justify-content-center">
+        <card  v-for="post in posts"
+  v-bind:key="post.id"
+  v-bind:title="post.title" 
+  v-bind:caption="post.caption"
+  v-bind:likes="post.likes"
+  v-bind:date_post="post.date_post"
+  v-bind:photo="post.photo"
+  v-bind:username="post.username"></card>
       </div>
       </div>
     </section>
    `,
     data: function() {
-       return {}
+       return {
+         posts: [
+      { id: 1, title: 'My journey with Vue',caption:'It is so easy',likes:58,date_post:'Feb 2018',photo:'https://vuejs.org/images/logo.png' ,username:'__me__'},
+      { id: 3, title: 'Why Vue is so fun',caption:'You just plug and go',likes:79,date_post:'Mar 2018',photo:'https://react-etc.net/files/2015-11/danguu.jpg' ,username:'__me__'} 
+    ]
+       }
     }
 });
 
@@ -300,8 +353,21 @@ const Search = Vue.component('search', {
    template: `
     <section class="wthree-row py-sm-5 py-3">
       <div class="container py-md-5">
+      <h2>Search profile and/or posts</h2>
         <div class="row py-lg-5 pt-md-5 pt-3 d-flex justify-content-center">
-        <card></card>
+
+        
+            <div id="custom-search-input">
+                <div class="input-group col-md-12">
+                    <input type="text" class="form-control input-lg" placeholder="search.." />
+                    <span class="input-group-btn">
+                        <button class="btn btn-info btn-lg" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </span>
+                </div>
+           
+  </div>
       </div>
       </div>
     </section>
@@ -313,11 +379,12 @@ const Search = Vue.component('search', {
 // Define Routes
 const router = new VueRouter({
     routes: [
-        { path: "/timeline", component: Timeline },
+        { path: "/", component: Timeline },
         { path: "/search", component: Search },
         { path: "/profile", component: Profile },
         { path: "/likes", component: Likes },
-        { path: "/upload", component: Upload }
+        { path: "/upload", component: Upload },
+        { path: "/following", component: Following}
     ]
 });
 
