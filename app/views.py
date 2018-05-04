@@ -124,7 +124,7 @@ def userLogout():
     logout_user()
     return jsonify(message= 'You have successfully logged out')    
 
-@app.route('/api/<user_id>/newpost', methods = ['POST'])
+@app.route('/api/<int:user_id>/newpost', methods = ['POST'])
 @login_required
 @requires_auth
 def newPost(user_id):
@@ -149,16 +149,30 @@ def newPost(user_id):
         return jsonify({'errors':form_errors(form)})
 
 """
+@app.route('/api/<int:username>', methods = ['GET'])
+@login_required
+@requires_auth
+def getProfile(username):
+    error=None
+    if request.method =='GET':
+        #get profile info,post,if-following user
+        else:
+            return jsonify({'errors': error})
+    else:
+        return jsonify({'errors':error)
 
-@app.route('/api/users/<user_id>/posts', methods = ['GET'])
-def userPosts(user_id):
+
+
 
 @app.route('/api/posts', methods = ['GET'])
 @login_required
 def allPosts():
-    posts=Posts.query.order_by(Posts.created_on).all()
-    return jsonify({'posts': add array function})
-
+    error=None
+    if request.method =='GET':
+        posts=Posts.query.order_by(Posts.created_on).all()
+        return jsonify({'posts': add array function})
+    else:
+        return jsonify({'errors':error)
 
 
 @app.route('/api/users/<int:user_id>/follow', methods = ['POST'])
