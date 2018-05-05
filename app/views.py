@@ -12,7 +12,7 @@ from forms import LoginForm, RegistrationForm, PostsForm
 from models import Users, Posts, Follows, Likes
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import CombinedMultiDict
-import jwt
+import jwt ,os
 from functools import wraps
 import base64
 
@@ -117,14 +117,14 @@ def login():
 def userLogout():
     g.current_user = None
     logout_user()
-    return jsonify({'message':'You have successfully logged out'})    
+    return jsonify({'messages':'You have successfully logged out'})    
 
 @app.route('/api/posts/new', methods = ['POST'])
 @login_required
 @requires_auth
-def newPost(user_id):
+def newPost():
     error=None
-    form = PostsForm()
+    form = PostsForm(CombinedMultiDict((request.files, request.form)))
     if request.method =='POST' and form.validate_on_submit():
         photo = form.photo.data
         caption = form.caption.data
@@ -132,11 +132,11 @@ def newPost(user_id):
             error='No selected file'
         if photo and allowed_file(photo.filename):
             filename = secure_filename(photo.filename)
-            newpost=Posts(user_id=user_id,photo=photo,caption=caption)
-            file.save(os.path.join(newpost.post_URI, filename))
+            newpost=Posts(user_id=current_user.id,photo=photo,caption=caption)
+            photo.save(os.path.join(newpost.post_URI, filename))
             db.session.add(newpost)
             db.session.commit()
-            return jsonify({'message':'Post successfully'})
+            return jsonify({'messages':'Post successfully'})
         else:
             error='File not allowed'
             return jsonify({'errors': error})
@@ -208,7 +208,7 @@ def update_profile_photo(username):
 def get_all_posts():
     error=None
     if request.method =='GET':
-        posts=Posts.query.order_by(Posts.created_on).all()
+        posts=Posts.query.order_by(Posts.created_on.desc()).all()
         listposts=[]
         for i in range (0,len(posts)):
             count=Likes.query.filter_by(post_id=posts[i].post_id).all()
@@ -328,6 +328,12 @@ def add_header(response):
 def page_not_found(error):
     """Custom 404 page."""
     return render_template('404.html'), 404
+
+
+@app.errorhandler(401)
+def unauthorized(error):
+    """Custom 401 page."""
+    return render_template('401.html'), 401
 
 @app.errorhandler(500)
 def internal_server_error(error):

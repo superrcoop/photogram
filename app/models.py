@@ -17,9 +17,9 @@ def get_new_id():
 def get_date():
     return datetime.date.today()
 
-def generate_file_URI(id=None):
-    if id:      
-        URI=UPLOAD_FOLDER+'/posts'+id
+def generate_file_URI(post_id=None):
+    if post_id:      
+        URI=UPLOAD_FOLDER+'/posts/'+str(post_id)
     URI=UPLOAD_FOLDER+'/'+str(uuid.uuid4().get_hex()[0:12])+'/'
     if not os.path.exists(URI):
         try:
@@ -89,7 +89,7 @@ class Posts(db.Model):
     def __init__(self,user_id,photo,caption):
         self.id=get_newpost_id()
         self.user_id=user_id
-        self.post_URI= generate_file_URI(user_id)
+        self.post_URI= generate_file_URI(id)
         self.caption=caption
         self.created_on=get_date()
 

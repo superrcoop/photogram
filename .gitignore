@@ -16,5 +16,6 @@ venv/
 # Flask Migrations 
 /migrations
 
-
+#uploads
+/app/static/uploads
 

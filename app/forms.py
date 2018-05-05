@@ -20,11 +20,11 @@ class RegistrationForm(FlaskForm):
 	location = StringField('Location', validators = [DataRequired('Whats your location?')])
 
 class PostsForm(FlaskForm):
-	photo = FileField('files[]', validators=[FileRequired(),FileAllowed(ALLOWED_EXTENSIONS, 'File not allowed')])
+	photo = FileField('photo', validators=[FileRequired(),FileAllowed(ALLOWED_EXTENSIONS, 'File not allowed')])
 	caption = TextAreaField('Caption', validators = [DataRequired(),Length(max=100)])
 
 class uploadphoto(FlaskForm):
-	photo = FileField('files[]', validators=[FileRequired(),FileAllowed(ALLOWED_EXTENSIONS, 'File not allowed')])
+	photo = FileField('photo', validators=[FileRequired(),FileAllowed(ALLOWED_EXTENSIONS, 'File not allowed')])
 
 class updateBio(FlaskForm):
 	biography = TextAreaField('Biography', validators=[DataRequired('Enter something about yourself'), Length(max=200)])

@@ -13,7 +13,7 @@ Vue.component('dashboard-header', {
             
               <button id="show-modal" @click="logout" > <i class="fas fa-cog"></i> Logout</button>
               <span class="w3-line"></span>
-              <p class="mt-3">Donec consequat sapien ut leo cursus rhoncus. Nullam dui mi, vulputate ac metus at, semper varius orci. Nulla accumsan
+              <p class="mt-3">Bio: Donec consequat sapien ut leo cursus rhoncus. Nullam dui mi, vulputate ac metus at, semper varius orci. Nulla accumsan
                 ac elit in congue. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</p>
             
             </div>
@@ -57,7 +57,8 @@ Vue.component('dashboard-header', {
         joined_on:'',
         posts:'',
         followers:'',
-        following:''
+        following:'',
+        bio:''
         
       }
     },
@@ -200,10 +201,15 @@ const Upload = Vue.component('upload', {
       <li v-for="error in errors">{{ error }}</li>
     </ul>
     </p>
+     <p class="alert alert-success" role="alert" v-if="messages.length">
+    <ul>
+      <li v-for="message in messages">{{ message }}</li>
+    </ul>
+  </p>
         <div class="row py-lg-5 pt-md-5 pt-3 d-flex justify-content-center">
-        <form id="uploadform"  @submit.prevent="uploadPost" method="POST" enctype="multipart/form-data">
-                <label for="photo">Upload photo</label>
-                <input class="form-control" id="file"  type="file" name="photo"/>
+        <form id="uploadForm"  @submit.prevent="uploadPost" method="POST" enctype="multipart/form-data">
+                <label class="input-group lead" for="photo">Upload photo</label>
+                <input  v-on:change="onSelectedFile" class="form-control" id="file"  type="file" accept="image/*" :name="photo"/>
                 <br>
                 <br>
                 <label class="input-group lead" for="caption">Caption</label>
@@ -219,21 +225,29 @@ const Upload = Vue.component('upload', {
     data: function() {
        return {
         errors:[],
+        messages:[],
         caption:'',
         photo:null
        }
     },methods: {
+      onSelectedFile: function(event){
+        let self=this;
+        self.photo=event.target.files[0]
+      },
+      
         uploadPost: function () {
             let self = this;
-            this.errors = [];
-          if(!this.photo){this.errors.push("Photo required.");}
-            let uploadForm = document.getElementById('uploadform');
-            let form_data = new FormData(uploadForm);
-            fetch("/api/"+localStorage.getItem('id')+"/newpost", { 
+            self.errors = [];
+          if(!self.photo){self.errors.push("Photo required.");}
+
+        let form_data = new FormData();
+        form_data.append('photo',self.photo,self.photo.name);
+        form_data.append('caption',self.caption);
+            fetch("/api/posts/new", { 
             method: 'POST',
             body: form_data,
             headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token'),
+                    'Authorization': 'Bearer ' + localStorage.getItem('jwt_token'),
                     'X-CSRFToken': token
                 },
             credentials: 'same-origin'
@@ -246,10 +260,12 @@ const Upload = Vue.component('upload', {
                 return response.json();
             })
             .then(function (jsonResponse) {
-                 if(jsonResponse.error) {
-            this.errors.push(jsonResponse.error);
+                 if(jsonResponse.errors) {
+            self.errors.push(jsonResponse.errors);
           }else{
-            alert("Successfully uploaded");
+            if(jsonResponse.messages) {
+            self.messages.push(jsonResponse.messages);
+          }
             console.log(jsonResponse);
           }
             })
@@ -347,7 +363,11 @@ const Search = Vue.component('search', {
       <div class="container py-md-5">
       <h2>Search profile and/or posts</h2>
         <div class="row py-lg-5 pt-md-5 pt-3 d-flex justify-content-center">
-
+         <p class="alert alert-success" role="alert" v-if="messages.length">
+    <ul>
+      <li v-for="message in messages">{{ message }}</li>
+    </ul>
+  </p>
         
             <div id="custom-search-input">
                 <div class="input-group col-md-12">
