@@ -222,13 +222,13 @@ const Login = Vue.component('login',{
             self.errors.push(jsonResponse.errors);
           }else{
           console.log(jsonResponse);
-          let token = jsonResponse.data.user_credentials[5];
-          let username=jsonResponse.data.user_credentials[0];
-          let location=jsonResponse.data.user_credentials[3];
-          let firstname=jsonResponse.data.user_credentials[1];
-          let lastname=jsonResponse.data.user_credentials[2];
-          let joined_on=jsonResponse.data.user_credentials[4];
-          let id=jsonResponse.data.user_credentials[6];
+          let token = jsonResponse.user_credentials[5];
+          let username=jsonResponse.user_credentials[0];
+          let location=jsonResponse.user_credentials[3];
+          let firstname=jsonResponse.user_credentials[1];
+          let lastname=jsonResponse.user_credentials[2];
+          let joined_on=jsonResponse.user_credentials[4];
+          let id=jsonResponse.user_credentials[6];
           localStorage.setItem('jwt_token', token);
           localStorage.setItem('username',username);
           localStorage.setItem('location',location);
@@ -260,8 +260,5 @@ const router = new VueRouter({
 // Instantiate our main Vue Instance
 let app = new Vue({
     el: "#app",
-    router,
-    data: {
-      token:''
-    }
+    router
 });

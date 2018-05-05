@@ -1,6 +1,6 @@
-drop database if exists info3180project2;
-create database info3180project2; 
-use info3180project2;
+drop database if exists photogram;
+create database photogram; 
+use photogram;
 
 create table users(
 	user_id int,
