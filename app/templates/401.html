@@ -1,0 +1,26 @@
+{% extends "error.html" %}
+
+{% block title %} <title>Unauthorized</title>{% endblock%}
+
+{% block main %}
+<div class="content" id="contentOne" style="margin-top: 363px;">
+                <h1>401</h1>
+                <div class="row">
+                    <div class="col-md-3"></div>
+                    <div class="col-md-6 message">
+                        <p class="row">
+                            </p><div class="col-xs-4">
+                                <i class="fa fa-exclamation-triangle icon" aria-hidden="true"></i>
+                            </div>
+                            <div class="col-xs-8 noCenter text">
+                                {{description}}
+                            </div>
+                        <p></p>
+                    </div>
+                    <div class="col-md-3"></div>
+                </div>
+                <div class="down" id="down">
+                    <a style="color: black" href="{{ url_for('index')}} "><i class="fa fa-home bounce animated" aria-hidden="true"></i></a>
+                </div>
+            </div>
+{% endblock %}

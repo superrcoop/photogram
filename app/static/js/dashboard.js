@@ -7,7 +7,7 @@ Vue.component('dashboard-header', {
           <div class="col-lg px-sm-5 px-3">
                 <div class="stats_agile mb-5">
               <img :src="photo" alt="Avatar" class="avatar">
-              <h3 class="stat-title text-uppercase">{{first_name}}{{last_name}}</h3>
+              <h3 class="stat-title text-uppercase">@{{user_name}}</h3>
               <p >Date Joined:{{joined_on}}</p>
               <p >Location: {{location}}</p>
             
@@ -151,7 +151,6 @@ Vue.component('card', {
                 <div class="col-lg-4">
                     <div class="card">
                         <img :src="photo" alt="photo">
-                        <h4>{{title}}</h4>
                         <p><i class="fa fa-calendar"></i> Posted on {{date_post}} by @{{username}}</p>
                         <p><i class="fa fa-tags"></i> Tags: <a href=""><span class="badge badge-info">Bootstrap</span></a> <a href=""><span class="badge badge-info">Web</span></a> <a href=""><span class="badge badge-info">CSS</span></a> <a href=""><span class="badge badge-info">HTML</span></a></p>
         
@@ -160,7 +159,7 @@ Vue.component('card', {
                     </div>
                 </div>
             </a>
-    `,props:['id','title','username','likes','date_post','tags','caption',"photo"]
+    `,props:['id','username','likes','date_post','tags','caption',"photo"]
 });
 
 const Timeline = Vue.component('timeline',{

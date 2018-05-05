@@ -221,14 +221,17 @@ const Login = Vue.component('login',{
           if(jsonResponse.errors) {
             self.errors.push(jsonResponse.errors);
           }else{
-          console.log(jsonResponse);
-          let token = jsonResponse.user_credentials[5];
-          let username=jsonResponse.user_credentials[0];
-          let location=jsonResponse.user_credentials[3];
-          let firstname=jsonResponse.user_credentials[1];
-          let lastname=jsonResponse.user_credentials[2];
-          let joined_on=jsonResponse.user_credentials[4];
-          let id=jsonResponse.user_credentials[6];
+          console.log(jsonResponse.messages);
+          let token = jsonResponse.user_credentials[8];
+          let username=jsonResponse.user_credentials[3];
+          let location=jsonResponse.user_credentials[6];
+          let firstname=jsonResponse.user_credentials[4];
+          let lastname=jsonResponse.user_credentials[5];
+          let joined_on=jsonResponse.user_credentials[7];
+          let id=jsonResponse.user_credentials[9];
+          let posts=jsonResponse.user_credentials[0];
+          let following=jsonResponse.user_credentials[1];
+          let followers=jsonResponse.user_credentials[2];
           localStorage.setItem('jwt_token', token);
           localStorage.setItem('username',username);
           localStorage.setItem('location',location);
@@ -236,6 +239,9 @@ const Login = Vue.component('login',{
           localStorage.setItem('lastname',lastname);
           localStorage.setItem('date_joined',joined_on);
           localStorage.setItem('id',id);
+          localStorage.setItem('post',posts);
+          localStorage.setItem('following',following);
+          localStorage.setItem('followers',followers);
           window.location = "/dashboard";
           }
           

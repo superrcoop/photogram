@@ -21,6 +21,39 @@ import base64
 def load_user(id):
    return Users.query.get(int(id))
 
+# Create a JWT @requires_auth decorator
+# This decorator can be used to denote that a specific route should check
+# for a valid JWT token before displaying the contents of that route.
+def requires_auth(f):
+  @wraps(f)
+  def decorated(*args, **kwargs):
+    auth = request.headers.get('Authorization', None)
+    if not auth:
+        return render_template('401.html',description='authorization_header_missing'), 401
+
+    parts = auth.split()
+
+    if parts[0].lower() != 'bearer':
+        return render_template('401.html',description='invalid_header:Authorization header must start with Bearer'), 401
+    elif len(parts) == 1:
+        return render_template('401.html',description='invalid_header:Token not found'), 401
+    elif len(parts) > 2:
+        return render_template('401.html',description='invalid_header:Authorization header must be Bearer + \s + token'), 401
+        
+    token = parts[1]
+    try:
+        payload = jwt.decode(token, app.config['TOKEN_SECRET'])
+
+    except jwt.ExpiredSignature:
+        return render_template('401.html',description='token_expired'), 401
+    except jwt.DecodeError:
+        return render_template('401.html',description='token_invalid_signature'), 401
+        
+    g.current_user = user = payload
+    return f(*args, **kwargs)
+
+  return decorated
+
 @app.route('/')
 def index():
     """Render website's initial page and let VueJS take over."""
@@ -28,7 +61,6 @@ def index():
 
 @app.route('/dashboard')
 @login_required
-@requires_auth
 def dashboard():
     """Render website's initial page and let VueJS take over."""
     return render_template('feed.html')
@@ -49,7 +81,7 @@ def register():
             user = Users(user_name = username, first_name = first_name, last_name = last_name, email = email, plain_password = plain_password,location=location)
             db.session.add(user)
             db.session.commit()
-            return jsonify({"user": username,"password":plain_password,'messages':'You have successfully registered'})
+            return jsonify({'messages':'You have successfully registered'})
         else:
             error = "Email and/or username already exists"
             return jsonify({'errors': error})
@@ -68,7 +100,10 @@ def login():
             login_user(user)
             payload = {'id': current_user.id, 'username': current_user.user_name}
             token = jwt.encode(payload, app.config['TOKEN_SECRET'], algorithm='HS256') 
-            userdata = [current_user.user_name,current_user.first_name,current_user.last_name,current_user.location,current_user.joined_on,token,current_user.id]
+            post=Posts.query.filter_by(user_id=user.id).all();
+            following=Follows.query.filter_by(user_id=user.id).all();
+            followers=Follows.query.filter_by(follower_id=user.id).all();
+            userdata = [len(post),len(following),len(followers),current_user.user_name,current_user.first_name,current_user.last_name,current_user.location,current_user.joined_on,token,current_user.id]
             return jsonify({'user_credentials': userdata, 'messages':"Token Generated"})
         else:
             error = "Invalid email and/or password"
@@ -118,14 +153,18 @@ def get_profile(username):
     if request.method =='GET':
         user=Users.query.filter_by(username=username).first()
         post=Posts.query.filter_by(user_id=user.id).all();
+        following=Follows.query.filter_by(user_id=user.id).all();
+        followers=Follows.query.filter_by(follower_id=user.id).all();
+        if Follows.query.filter_by(user=)
         user_info={
             'id':user.id,
             'username':user.username,
             'bio':user.bio,
             'posts':len(posts),
-            'followers':,
-            'following':,
-            'photo':user.file_URI
+            'followers':len(followers),
+            'following':len(following),
+            'photo':user.file_URI,
+            'follow':follow
         }
         listposts=[]
         for i in range (0,len(posts)):
@@ -163,7 +202,6 @@ def update_profile_photo(username):
         return jsonify({'errors': error})
     else:
         return jsonify({'errors':error})
-
 
 @app.route('/api/posts/all', methods = ['GET'])
 @login_required
@@ -244,7 +282,7 @@ def like_post(post_id):
         like=Likes(post_id,current_user.id)
         db.session.add(like)
         db.session.commit()       
-        return jsonify(response= [{'message':'Post successully liked'}])
+        return jsonify(response= [{'messages':'Post successully liked'}])
 
 @app.route('/api/posts/<int:post_id>/unlike', methods =['POST'])
 @login_required
@@ -263,7 +301,7 @@ def unfollow_user(username):
         user=Users.query.filter_by(username=username).first()
         follow=Follows.query.filter_by(user_id=user.id)
         #unfollow da bitch
-        return jsonify({'message':'Unfollowing '+user.username})
+        return jsonify({'messages':'Unfollowing '+user.username})
 
 
 """
@@ -296,38 +334,6 @@ def internal_server_error(error):
     """Custom 500 page."""
     return render_template('500.html'), 500
 
-# Create a JWT @requires_auth decorator
-# This decorator can be used to denote that a specific route should check
-# for a valid JWT token before displaying the contents of that route.
-def requires_auth(f):
-  @wraps(f)
-  def decorated(*args, **kwargs):
-    auth = request.headers.get('Authorization', None)
-    if not auth:
-      return jsonify({'code': 'authorization_header_missing', 'description': 'Authorization header is expected'}), 401
-
-    parts = auth.split()
-
-    if parts[0].lower() != 'bearer':
-      return jsonify({'code': 'invalid_header', 'description': 'Authorization header must start with Bearer'}), 401
-    elif len(parts) == 1:
-      return jsonify({'code': 'invalid_header', 'description': 'Token not found'}), 401
-    elif len(parts) > 2:
-      return jsonify({'code': 'invalid_header', 'description': 'Authorization header must be Bearer + \s + token'}), 401
-
-    token = parts[1]
-    try:
-         payload = jwt.decode(token, app.config['TOKEN_SECRET'])
-
-    except jwt.ExpiredSignature:
-        return jsonify({'code': 'token_expired', 'description': 'token is expired'}), 401
-    except jwt.DecodeError:
-        return jsonify({'code': 'token_invalid_signature', 'description': 'Token signature is invalid'}), 401
-
-    g.current_user = user = payload
-    return f(*args, **kwargs)
-
-  return decorated
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port="8080")

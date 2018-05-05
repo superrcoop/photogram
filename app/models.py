@@ -15,7 +15,7 @@ def get_new_id():
 
 
 def get_date():
-    return datetime.datetime.now().today()
+    return datetime.date.today()
 
 def generate_file_URI(id=None):
     if id:      
@@ -112,8 +112,8 @@ class Likes(db.Model):
 class Follows(db.Model):
     __tablename__ = 'follows'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer,nullable=False)
-    follower_id = db.Column(db.Integer,db.ForeignKey('users.id'),nullable=False)
+    user_id = db.Column(db.Integer,db.ForeignKey('users.id'),nullable=False)
+    follower_id = db.Column(db.Integer,nullable=False)
 
     def __init__(self,user_id,follower_id):
         id=get_new_id()
