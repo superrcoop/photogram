@@ -47,6 +47,8 @@ Vue.component('dashboard-header', {
     `,
     data:function(){
       return{
+        errors:[],
+        messages:[],
         user_name:'',
         first_name:'',
         last_name:'',
@@ -98,7 +100,6 @@ Vue.component('dashboard-header', {
             self.errors.push(jsonResponse.errors);
           }else{
                        localStorage.clear();
-                       self.removeToken();
                          window.location = "/";
                     };
                 })
@@ -106,15 +107,7 @@ Vue.component('dashboard-header', {
                     console.log(error);
                 });
             }
-        },
-        // Remove token stored in localStorage.
-        // Usually you will remove it when a user logs out of your web application
-        // or if the token has expired.
-        removeToken: function () {
-            localStorage.removeItem('jwt_token');
-            console.info('Token removed from localStorage.');
-            alert('Token removed!');  
-            }    
+        }    
     }
 });
 

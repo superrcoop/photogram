@@ -17,6 +17,285 @@ from functools import wraps
 import base64
 
 
+@login_manager.user_loader
+def load_user(id):
+   return Users.query.get(int(id))
+
+@app.route('/')
+def index():
+    """Render website's initial page and let VueJS take over."""
+    return render_template('index.html')
+
+@app.route('/dashboard')
+@login_required
+@requires_auth
+def dashboard():
+    """Render website's initial page and let VueJS take over."""
+    return render_template('feed.html')
+
+@app.route('/api/users/register', methods = ['POST'])
+def register():
+    error=None
+    form = RegistrationForm()
+    if request.method == 'POST' and form.validate_on_submit():
+        username = form.username.data
+        plain_password = form.plain_password.data
+        conf_password = form.conf_password.data
+        first_name = form.first_name.data
+        last_name = form.last_name.data
+        email = form.email.data
+        location = form.location.data
+        if not Users.query.filter_by(email = email).first() and not Users.query.filter_by(user_name = username).first():
+            user = Users(user_name = username, first_name = first_name, last_name = last_name, email = email, plain_password = plain_password,location=location)
+            db.session.add(user)
+            db.session.commit()
+            return jsonify({"user": username,"password":plain_password,'messages':'You have successfully registered'})
+        else:
+            error = "Email and/or username already exists"
+            return jsonify({'errors': error})
+    else:
+        return jsonify({'errors':form_errors(form)})
+
+@app.route('/api/auth/login', methods = ['POST'])
+def login():
+    error=None
+    form = LoginForm()
+    if request.method == 'POST' and form.validate_on_submit():
+        username = form.username.data
+        plain_password = form.plain_password.data
+        user = Users.query.filter_by(user_name = username).first()
+        if user and user.is_correct_password(plain_password): 
+            login_user(user)
+            payload = {'id': current_user.id, 'username': current_user.user_name}
+            token = jwt.encode(payload, app.config['TOKEN_SECRET'], algorithm='HS256') 
+            userdata = [current_user.user_name,current_user.first_name,current_user.last_name,current_user.location,current_user.joined_on,token,current_user.id]
+            return jsonify({'user_credentials': userdata, 'messages':"Token Generated"})
+        else:
+            error = "Invalid email and/or password"
+            return jsonify({'errors': error})
+    else:
+        return jsonify({'errors':form_errors(form)})
+
+@app.route('/api/auth/logout', methods = ['GET'])
+@login_required
+@requires_auth
+def userLogout():
+    g.current_user = None
+    logout_user()
+    return jsonify({'message':'You have successfully logged out'})    
+
+@app.route('/api/posts/new', methods = ['POST'])
+@login_required
+@requires_auth
+def newPost(user_id):
+    error=None
+    form = PostsForm()
+    if request.method =='POST' and form.validate_on_submit():
+        photo = form.photo.data
+        caption = form.caption.data
+        if photo.filename == '':
+            error='No selected file'
+        if photo and allowed_file(photo.filename):
+            filename = secure_filename(photo.filename)
+            newpost=Posts(user_id=user_id,photo=photo,caption=caption)
+            file.save(os.path.join(newpost.post_URI, filename))
+            db.session.add(newpost)
+            db.session.commit()
+            return jsonify({'message':'Post successfully'})
+        else:
+            error='File not allowed'
+            return jsonify({'errors': error})
+    else:
+        return jsonify({'errors':form_errors(form)})
+
+""" A P I
+
+@app.route('/api/users/<username>', methods = ['GET'])
+@login_required
+@requires_auth
+def get_profile(username):
+    error=None
+    if request.method =='GET':
+        user=Users.query.filter_by(username=username).first()
+        post=Posts.query.filter_by(user_id=user.id).all();
+        user_info={
+            'id':user.id,
+            'username':user.username,
+            'bio':user.bio,
+            'posts':len(posts),
+            'followers':,
+            'following':,
+            'photo':user.file_URI
+        }
+        listposts=[]
+        for i in range (0,len(posts)):
+            count=Likes.query.filter_by(post_id=posts[i].post_id).all()
+            post_data={
+            'id':posts[i].id,
+            'photo':post[i].Post_URI,
+            'caption':posts[i].caption,
+            'created_on':posts[i].created_on,
+            'likes':len(count),
+            'username':user.username,
+            'userphoto':user.profile_photo
+            }
+            listposts.append(post_data)
+        return jsonify({'profile_info': user_info,'posts':listposts})
+    else:
+        return jsonify({'errors':error})
+
+@app.route('/api/users/<username>/bio/update', methods = ['POST'])
+@login_required
+@requires_auth
+def update_profile_bio(username):
+    error=None
+    if request.method =='POST':
+        return jsonify({'errors': error})
+    else:
+        return jsonify({'errors':error})
+
+@app.route('/api/users/<int:username>/profile_photo/update', methods = ['POST'])
+@login_required
+@requires_auth
+def update_profile_photo(username):
+    error=None
+    if request.method =='POST':
+        return jsonify({'errors': error})
+    else:
+        return jsonify({'errors':error})
+
+
+@app.route('/api/posts/all', methods = ['GET'])
+@login_required
+def get_all_posts():
+    error=None
+    if request.method =='GET':
+        posts=Posts.query.order_by(Posts.created_on).all()
+        listposts=[]
+        for i in range (0,len(posts)):
+            count=Likes.query.filter_by(post_id=posts[i].post_id).all()
+            user=Users.query.filter_by(id=posts[i].user_id).first();
+            post_data={
+            'id':posts[i].id,
+            'photo':post[i].Post_URI,
+            'caption':posts[i].caption,
+            'created_on':posts[i].created_on,
+            'likes':len(count),
+            'username':user.username,
+            'userphoto':user.profile_photo
+            }
+            listsposts.append(post_data)
+        return jsonify({'posts': listsposts})
+    else:
+        return jsonify({'errors':error})
+
+@app.route('/api/posts/<int:post_id>', methods = ['GET'])
+@login_required
+def get_post(post_id):
+    error=None
+    if request.method=='GET':
+        post=Posts.query.filter_by(id=post_id).first();
+        user=Users.query.filter_by(id=post.user_id).first();
+        count=Likes.query.filter_by(post_id=post_id).all()
+        return jsonify({
+        'post_id':posts.id,
+        'photo':posts.post_URI,
+        'caption':posts.caption,
+        'created_on':posts.created_on,
+        'likes':len(count),
+        'username':user.username,
+        'userphoto':user.profile_photo
+        })
+    else:
+        return jsonify({'errors':error})
+
+@app.route('/api/posts/<int:post_id>/delete', methods = ['GET','POST'])
+@login_required
+def delete_post(post_id):
+    error=None
+    if request.method =='GET':
+        post=Posts.query.filter_by(id=post_id).first();
+        if post:
+            #remove post
+        return jsonify({'messages':'Post sucessfully deleted'})
+    else:
+        return jsonify({'errors':error})
+
+@app.route('/api/users/<username>/follow', methods = ['POST','GET'])
+@login_required
+@requires_auth
+def follow_user(username):
+    if request.method == 'POST':
+        user=Users.query.filter_by(username=username).first()
+        if user:
+            follow=Follows(user.id,current_user.id)
+            db.session.add(follow)
+            db.session.commit()
+            return jsonify(response = [{'messages':'You are now following '+ username}])
+        else:
+            return jsonify(response = [{'errors':'User not found'}])
+
+
+@app.route('/api/posts/<int:post_id>/like', methods =['POST'])
+@login_required
+@requires_auth
+def like_post(post_id):
+    if request.method == 'POST':
+        like=Likes(post_id,current_user.id)
+        db.session.add(like)
+        db.session.commit()       
+        return jsonify(response= [{'message':'Post successully liked'}])
+
+@app.route('/api/posts/<int:post_id>/unlike', methods =['POST'])
+@login_required
+@requires_auth
+def unlike_post(post_id):
+    if request.method == 'POST':
+        #userlike=Likes(post_id,current_user.id)
+        db.session.commit()       
+        return jsonify(response= [{'message':'Post unliked'}])
+
+@app.route('/api/users/<username>/unfollow', methods = ['POST'])
+@login_required
+@requires_auth
+def unfollow_user(username):
+    if request.method == 'POST':
+        user=Users.query.filter_by(username=username).first()
+        follow=Follows.query.filter_by(user_id=user.id)
+        #unfollow da bitch
+        return jsonify({'message':'Unfollowing '+user.username})
+
+
+"""
+@app.route('/<file_name>.txt')
+def send_text_file(file_name):
+    """Send your static text file."""
+    file_dot_text = file_name + '.txt'
+    return app.send_static_file(file_dot_text)
+
+
+@app.after_request
+def add_header(response):
+    """
+    Add headers to both force latest IE rendering engine or Chrome Frame,
+    and also tell the browser not to cache the rendered page. If we wanted
+    to we could change max-age to 600 seconds which would be 10 minutes.
+    """
+    response.headers['X-UA-Compatible'] = 'IE=Edge,chrome=1'
+    response.headers['Cache-Control'] = 'public, max-age=0'
+    return response
+
+
+@app.errorhandler(404)
+def page_not_found(error):
+    """Custom 404 page."""
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def internal_server_error(error):
+    """Custom 500 page."""
+    return render_template('500.html'), 500
+
 # Create a JWT @requires_auth decorator
 # This decorator can be used to denote that a specific route should check
 # for a valid JWT token before displaying the contents of that route.
@@ -49,190 +328,6 @@ def requires_auth(f):
     return f(*args, **kwargs)
 
   return decorated
-
-@login_manager.user_loader
-def load_user(id):
-   return Users.query.get(int(id))
-
-@app.route('/')
-def index():
-    """Render website's initial page and let VueJS take over."""
-    return render_template('index.html')
-
-@app.route('/dashboard')
-@login_required
-def dashboard():
-    #user = g.current_user
-    """
-    payload = {'id': current_user.id, 'username': current_user.user_name}
-    token = jwt.encode(payload, app.config['TOKEN_SECRET'], algorithm='HS256') 
-    userdata = [current_user.current_user_name,current_user.first_name,current_user.last_name,token]
-    message="Token Generated"
-    """
-
-    """Render website's initial page and let VueJS take over."""
-    return render_template('feed.html')
-
-@app.route('/api/users/register', methods = ['POST'])
-def register():
-    error=None
-    form = RegistrationForm()
-    if request.method == 'POST' and form.validate_on_submit():
-        username = form.username.data
-        plain_password = form.plain_password.data
-        conf_password = form.conf_password.data
-        first_name = form.first_name.data
-        last_name = form.last_name.data
-        email = form.email.data
-        location = form.location.data
-        if not Users.query.filter_by(email = email).first() and not Users.query.filter_by(user_name = username).first():
-            user = Users(user_name = username, first_name = first_name, last_name = last_name, email = email, plain_password = plain_password,location=location)
-            db.session.add(user)
-            db.session.commit()
-            return jsonify(data={"user": username,"password":plain_password},message="You have successfully registered")
-        else:
-            error = "Email and/or username already exists"
-            return jsonify({'errors': error})
-    else:
-        return jsonify({'errors':form_errors(form)})
-
-@app.route('/api/auth/login', methods = ['POST'])
-def login():
-    error=None
-    form = LoginForm()
-    if request.method == 'POST' and form.validate_on_submit():
-        username = form.username.data
-        plain_password = form.plain_password.data
-        user = Users.query.filter_by(user_name = username).first()
-        if user and user.is_correct_password(plain_password): 
-            login_user(user)
-            payload = {'id': current_user.id, 'username': current_user.user_name}
-            token = jwt.encode(payload, app.config['TOKEN_SECRET'], algorithm='HS256') 
-            userdata = [current_user.user_name,current_user.first_name,current_user.last_name,current_user.location,current_user.joined_on,token,current_user.id]
-            return jsonify(data={'user_credentials': userdata}, message="Token Generated")
-        else:
-            error = "Invalid email and/or password"
-            return jsonify({'errors': error})
-    else:
-        return jsonify({'errors':form_errors(form)})
-
-@app.route('/api/auth/logout', methods = ['GET'])
-@login_required
-@requires_auth
-def userLogout():
-    g.current_user = None
-    logout_user()
-    return jsonify(message= 'You have successfully logged out')    
-
-@app.route('/api/<int:user_id>/newpost', methods = ['POST'])
-@login_required
-@requires_auth
-def newPost(user_id):
-    error=None
-    form = PostsForm()
-    if request.method =='POST' and form.validate_on_submit():
-        photo = form.photo.data
-        caption = form.caption.data
-        if photo.filename == '':
-            error='No selected file'
-        if photo and allowed_file(photo.filename):
-            filename = secure_filename(photo.filename)
-            newpost=Posts(user_id=user_id,photo=photo,caption=caption)
-            file.save(os.path.join(newpost.post_URI, filename))
-            db.session.add(newpost)
-            db.session.commit()
-            return jsonify(message="Post successfully")
-        else:
-            error='File not allowed'
-            return jsonify({'errors': error})
-    else:
-        return jsonify({'errors':form_errors(form)})
-
-"""
-@app.route('/api/<int:username>', methods = ['GET'])
-@login_required
-@requires_auth
-def getProfile(username):
-    error=None
-    if request.method =='GET':
-        #get profile info,post,if-following user
-        else:
-            return jsonify({'errors': error})
-    else:
-        return jsonify({'errors':error)
-
-
-
-
-@app.route('/api/posts', methods = ['GET'])
-@login_required
-def allPosts():
-    error=None
-    if request.method =='GET':
-        posts=Posts.query.order_by(Posts.created_on).all()
-        return jsonify({'posts': add array function})
-    else:
-        return jsonify({'errors':error)
-
-
-@app.route('/api/users/<int:user_id>/follow', methods = ['POST'])
-@login_required
-@requires_auth
-def userFollow(user_id):
-    if request.method == 'POST':
-        userfollow=Follows(user_id,current_user.id)
-        db.session.add(userfollow)
-        db.session.commit()
-        user=Users.query.filter_by(id=user_id).first()
-        return jsonify(response = [{'message':'Now following'+user.username}])
-
-
-@app.route('/api/posts/<int:post_id>/like', methods =['POST'])
-@login_required
-@requires_auth
-def userLike(post_id):
-    if request.method == 'POST':
-        userlike=Likes(post_id,current_user.id)
-        db.session.add(userlike)
-        db.session.commit()
-
-        # add count function
-        def countlikes(post_id):
-            count=Likes.query.filter_by(post_id=post_id).all()
-            return len(count)
-        return jsonify(response= [{'message':'Liked','Likes':count}])
-
-"""
-@app.route('/<file_name>.txt')
-def send_text_file(file_name):
-    """Send your static text file."""
-    file_dot_text = file_name + '.txt'
-    return app.send_static_file(file_dot_text)
-
-
-@app.after_request
-def add_header(response):
-    """
-    Add headers to both force latest IE rendering engine or Chrome Frame,
-    and also tell the browser not to cache the rendered page. If we wanted
-    to we could change max-age to 600 seconds which would be 10 minutes.
-    """
-    response.headers['X-UA-Compatible'] = 'IE=Edge,chrome=1'
-    response.headers['Cache-Control'] = 'public, max-age=0'
-    return response
-
-
-@app.errorhandler(404)
-def page_not_found(error):
-    """Custom 404 page."""
-    return render_template('404.html'), 404
-
-@app.errorhandler(500)
-def internal_server_error(error):
-    """Custom 500 page."""
-    return render_template('500.html'), 500
-
-
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port="8080")

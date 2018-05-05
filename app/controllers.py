@@ -27,3 +27,4 @@ def get_uploaded_images(user_URI):
         for file in files:
             ls=os.path.join(subdir,file).split('/')[-2:]
     return '/'.join(ls)
+
