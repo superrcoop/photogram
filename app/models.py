@@ -19,8 +19,9 @@ def get_date():
 
 def generate_file_URI(post_id=None):
     if post_id:      
-        URI=UPLOAD_FOLDER+'/posts/'+str(post_id)
-    URI=UPLOAD_FOLDER+'/'+str(uuid.uuid4().get_hex()[0:12])+'/'
+        URI=UPLOAD_FOLDER+'/posts/'
+    else:
+        URI=UPLOAD_FOLDER+'/'+str(uuid.uuid4().get_hex()[0:12])+'/'
     if not os.path.exists(URI):
         try:
             os.makedirs(URI)

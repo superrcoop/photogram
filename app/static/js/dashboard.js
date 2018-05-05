@@ -209,8 +209,9 @@ const Upload = Vue.component('upload', {
         <div class="row py-lg-5 pt-md-5 pt-3 d-flex justify-content-center">
         <form id="uploadForm"  @submit.prevent="uploadPost" method="POST" enctype="multipart/form-data">
                 <label class="input-group lead" for="photo">Upload photo</label>
-                <input  v-on:change="onSelectedFile" class="form-control" id="file"  type="file" accept="image/*" :name="photo"/>
+                <input ref="fileInput" style="display:none" v-on:change="onSelectedFile" class="form-control" id="file"  type="file" accept="image/*" :name="photo"/>
                 <br>
+                <a class="btn btn-secondary" @click="$refs.fileInput.click()">Select file</a>
                 <br>
                 <label class="input-group lead" for="caption">Caption</label>
                 <textarea class="form-control" rows="3"  v-model="caption" placeholder="Write a caption..." id="caption" name="caption"></textarea>
@@ -241,7 +242,7 @@ const Upload = Vue.component('upload', {
           if(!self.photo){self.errors.push("Photo required.");}
 
         let form_data = new FormData();
-        form_data.append('photo',self.photo,self.photo.name);
+        form_data.append('photo',self.photo);
         form_data.append('caption',self.caption);
             fetch("/api/posts/new", { 
             method: 'POST',
