@@ -42,49 +42,51 @@ create table follows(
 	foreign key (user_id) references users(user_id) on delete cascade on update cascade
 );
 
-INSERT INTO users VALUES (10000001, "shantolforever", "hysmo56"         , "Shantol" , "Miekles", "smiekless@gmail.com"  ,   "Kinston"     , "I love basketball."                          , ".app\static\upload\<user_id>\profilephoto" ,"2017/10/1" );
-INSERT INTO users VALUES (10000002, "youngboss"     , "klgon23"         , "Kevin"   , "Junior" , "kevinjr@hype.com"     ,   "Montego Bay" , "Forever Working Towards The Paper."          , ".app\static\upload\<user_id>\profilephoto" ,"2017/08/05");
-INSERT INTO users VALUES (10000003, "threehype"     , "junior23"        ,"Nicholas" , "Smith"  , "nichsmith23@yahoo.com",   "St Elizabeth", "Young Wild and Free."                        , ".app\static\upload\<user_id>\profilephoto" ,"2017/05/26" );
-INSERT INTO users VALUES (10000004, "kimmykitty"    , "kingJks"         , "Kimberly", "Kurtis" , "kurtiskim24@yahoo.com",   "Trelawny"    , "I am free like the ocean. I love travelling.", ".app\static\upload\<user_id>\profilephoto" ,"2015/04/01");
-INSERT INTO users VALUES (10000005, "wildrebecca"   , "unforgettable577", "Rebecca" , "Reid"   , "rebeccarr33@hotmail.com", "St. Andrew"  , "I am an entrepreneur."                       , ".app\static\upload\<user_id>\profilephoto" ,"2016/12/24");
-INSERT INTO users VALUES (10000006, "sammyforever"  , "funpass7766"     , "Samantha", "Neil"   , "sammyneil78@gmail.com",   "Clarendon"   , "I am a student at U-tech."                   , ".app\static\upload\<user_id>\profilephoto" ,"2017/09/18" );
-INSERT INTO users VALUES (10000007, "humblehenry"   , "839hhsls"        , "Henry"   , "Charles", "henrycha76al@gmail.com", "Hanover"      , "Pastry is my passion."                       , ".app\static\upload\<user_id>\profilephoto" ,"2015/08/13");
-INSERT INTO users VALUES (10000008, "musicalstyles" , "HUkd733"         , "Michael" , "Powell" , "powellmike@hotmail.com", "Portland"     , "I am an artiste. I will forever love music"  , ".app\static\upload\<user_id>\profilephoto" ,"2017/03/12");
-INSERT INTO users VALUES (10000009, "gorgeousgia"   ,"739HKnjnd"        , "Gia"     , "James"  , "giajames44@mua.com"    , "St. Thomas"   , "I am a make-up artist. I can transform you"  , ".app\static\upload\<user_id>\profilephoto" ,"2016/02/11");
-INSERT INTO users VALUES (10000010, "jugglegym"     , "jsie893njd"      , "Christopher", "Smart", "chrissmart@gmail.com" , "Manchester"   , "Gyming is life. It's my life!"               , ".app\static\upload\<user_id>\profilephoto" ,"2017/04/09");
+
+/* 
+
+create table comments(
+	comment_id int,
+	post_id int,
+	user_id int,
+	comment varchar(300),
+	created_on date,
+	primary key (comment_id),
+	foreign key (user_id) references users(user_id) on delete cascade on update cascade
+);
 
 
-INSERT INTO posts VALUES(20000001, 10000001,".app\static\upload\<posts_id>\postsphoto" ,"Basketball"     ,"2017/10/1");
-INSERT INTO posts VALUES(20000002, 10000002,".app\static\upload\<posts_id>\postsphoto" ,"Cash or Cheque" ,"2017/08/05");
-INSERT INTO posts VALUES(20000003, 10000003,".app\static\upload\<posts_id>\postsphoto" ,"Escape"         ,"2017/05/26");
-INSERT INTO posts VALUES(20000004, 10000004,".app\static\upload\<posts_id>\postsphoto" ,"Greece"         ,"2015/04/01");
-INSERT INTO posts VALUES(20000005, 10000005,".app\static\upload\<posts_id>\postsphoto" ,"Bossman"        ,"2016/12/24");
-INSERT INTO posts VALUES(20000006, 10000006,".app\static\upload\<posts_id>\postsphoto" ,"Studying"       ,"2017/09/18");
-INSERT INTO posts VALUES(20000007, 10000007,".app\static\upload\<posts_id>\postsphoto" ,"Macaroons"      ,"2015/08/13");
-INSERT INTO posts VALUES(20000008, 10000008,".app\static\upload\<posts_id>\postsphoto" ,"Nicki Minaj"    ,"2017/03/12");
-INSERT INTO posts VALUES(20000009, 10000009,".app\static\upload\<posts_id>\postsphoto" ,"Kylie Cosmetics","2016/02/11");
-INSERT INTO posts VALUES(20000010, 10000010,".app\static\upload\<posts_id>\postsphoto" ,"Express Fitness","2017/04/09");
+
+ eg. Tables
+
+                 List of relations
+ Schema |      Name       | Type  |     Owner      
+--------+-----------------+-------+----------------
+ public | alembic_version | table | 
+ public | follows         | table | 
+ public | likes           | table | 
+ public | posts           | table | 
+ public | users           | table | 
+(5 rows)
 
 
-INSERT INTO likes VALUES(30000001, 10000001, 40000001);
-INSERT INTO likes VALUES(30000002, 10000002, 40000002);
-INSERT INTO likes VALUES(30000003, 10000003, 40000003);
-INSERT INTO likes VALUES(30000004, 10000004, 40000004);
-INSERT INTO likes VALUES(30000005, 10000005, 40000005);
-INSERT INTO likes VALUES(30000006, 10000006, 40000006);
-INSERT INTO likes VALUES(30000007, 10000007, 40000007);
-INSERT INTO likes VALUES(30000008, 10000008, 40000008);
-INSERT INTO likes VALUES(30000009, 10000009, 40000009);
-INSERT INTO likes VALUES(30000010, 10000010, 40000010);
+    id    | user_name |                           password                           | first_name | last_name |        email        |     location     | biography | profile_photo | joined_on  
+----------+-----------+--------------------------------------------------------------+------------+-----------+---------------------+------------------+-----------+---------------+------------
+ 90667879 | coope12   | $2b$12$6Csa/rtHiu.z2zNb7EZ16OR3AX25OQsiII55gj.My.j9EOU2ROXb6 | jordan     | cooper    | email@email.com     | kingstion        |           |               | 2018-04-30
+ 10697786 | test3     | $2b$12$F4tK0b4CSQ7imDUZcK6w4.zb1ANX2IiX8tcWqUgGRFmutZ/vpJ.QG | test       | test2     | email@emaol.com     | Kingston         |           |               | 2018-04-30
+
+id   | user_id  |                     post_URI                      |  caption  | created_on 
+--------+----------+------------------------------------------------+-----------+------------
+ 14bb65 | 90667879 | ./app/static/uploads/posts/14bb65              | Caption   | 2018-05-05
+ a4c782 | 90667879 | ./app/static/uploads/posts/a4c782              | #waves.   | 2018-05-05
+
+ id | user_id | follower_id 
+----+---------+-------------
+(0 rows)
 
 
-INSERT INTO follows VALUES(40000001, 10000001, 50000001);
-INSERT INTO follows VALUES(40000002, 10000002, 50000002);
-INSERT INTO follows VALUES(40000003, 10000003, 50000003);
-INSERT INTO follows VALUES(40000004, 10000004, 50000004);
-INSERT INTO follows VALUES(40000005, 10000005, 50000005);
-INSERT INTO follows VALUES(40000006, 10000006, 50000006);
-INSERT INTO follows VALUES(40000007, 10000007, 50000007);
-INSERT INTO follows VALUES(40000008, 10000008, 50000008);
-INSERT INTO follows VALUES(40000009, 10000009, 50000009);
-INSERT INTO follows VALUES(40000010, 10000010, 50000010);
+ id | user_id | post_id 
+----+---------+---------
+(0 rows)
+
+*/
