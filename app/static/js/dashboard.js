@@ -219,7 +219,6 @@ const Upload = Vue.component('upload', {
                 <button class="btn btn-primary" type="submit">Submit</button>
             </form>
       </div>
-
       </div>
     </section>
    `,
