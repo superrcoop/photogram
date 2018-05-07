@@ -93,7 +93,7 @@ Vue.component('dashboard-header', {
               if (!response.ok) {
           throw Error(response.statusText);
 
-               };
+               }
               return response.json();
         })
         .then(function (jsonResponse) {
@@ -102,7 +102,7 @@ Vue.component('dashboard-header', {
           }else{
                        localStorage.clear();
                          window.location = "/";
-                    };
+                    }
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -148,47 +148,219 @@ Vue.component('dashboard-footer', {
 Vue.component('card', {
     template: `
    
-          <a href="#">
-                <div class="col-lg-4">
-                    <div class="card">
-                        <img :src="photo" alt="photo">
-                        <p><i class="fa fa-calendar"></i> Posted on {{date_post}} by @{{username}}</p>
-                        <p><i class="fa fa-tags"></i> Tags: <a href=""><span class="badge badge-info">Bootstrap</span></a> <a href=""><span class="badge badge-info">Web</span></a> <a href=""><span class="badge badge-info">CSS</span></a> <a href=""><span class="badge badge-info">HTML</span></a></p>
+                <div class="col-sm-6 col-md-4 col-lg-3 mt-4">
+                <div class="card card-inverse card-info">
+                    <a href=""><img class="card-img-top" :src="photo"></a>
+                    <div class="card-block">
+                        <figure class="profile profile-inline">
+                            <img src="http://success-at-work.com/wp-content/uploads/2015/04/free-stock-photos.gif" class="profile-avatar" alt="">
+                        </figure>
+                        <h4 class="card-title">@{{username}}</h4>
+                        <p><i class="fa fa-tags"></i> Tags: <a href=""><span class="badge badge-info">#waves</span></a> <a href=""><span class="badge badge-info">#CSS</span></a> <a href=""><span class="badge badge-info">#Vue.js</span></a></p>
         
-                        <p>{{caption}}</p>
-                        <p><i class="far fa-thumbs-up"></i>{{likes}}</p>
+                        <div class="card-text">
+                            {{caption}}
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <small>Posted: {{date_post}}</small>
+                        <p v-if="isLiked">
+    <button @click="unlike" class="float-right far fa-thumbs-down">{{likes}}</button>
+    </p>
+     <p v-else>
+    <a @click=like" class="float-right far fa-thumbs-up"> {{likes}}</a>
+    </p>
+    <p v-if="this.username===this.user">
+    <button @click="delete_post" class="fas fa-trash-alt float-right"></button>
+    </p>
                     </div>
                 </div>
-            </a>
-    `,props:['id','username','likes','date_post','tags','caption',"photo"]
+            </div>
+    `,props:['id','username','likes','date_post','tags','caption',"photo","liked"],
+    data:function(){
+      return {
+        isLiked:this.liked,
+        user:localStorage.getItem('username'),
+        post_id:this.id
+      }
+    }
+    ,methods:{
+      delete_post:function(){
+        let self= this;
+                var payload = {
+                post_id: self.id,
+              username:self.username
+              };
+
+              var data = new FormData();
+            data.append( "json", JSON.stringify( payload ) );
+            console.log(payload,data);
+                fetch("/api/posts/delete", { 
+                    method: 'POST',
+                    body:payload,
+                    headers: {
+                            'Authorization': 'Bearer ' + localStorage.getItem('jwt_token'),
+                            'X-CSRFToken': token
+                        },
+                    credentials: 'same-origin'
+                    
+                    })
+                    .then(function (response) {
+                     if (!response.ok) {
+                throw Error(response.statusText);
+                }
+                return response.json();
+                  })
+                .then(function (jsonResponse) {
+                 if(jsonResponse.errors) {
+            self.errors.push(jsonResponse.errors);
+                  }else{
+                      console.log(jsonResponse);
+                      console.log("Deleted");
+                    }
+                 })
+               .catch(function (error) {
+                        console.log(error);
+                    });
+      },
+            like:function(){
+                let self= this;
+                var payload = {
+                post_id: this.id,
+              username:this.username
+              };
+
+              var data = new FormData();
+            data.append( "json", JSON.stringify( payload ) );
+            console.log(payload,data);
+                fetch("/api/posts/like", { 
+                    method: 'POST',
+                    body:payload,
+                    headers: {
+                            'Authorization': 'Bearer ' + localStorage.getItem('jwt_token'),
+                            'X-CSRFToken': token
+                        },
+                    credentials: 'same-origin'
+                    
+                    })
+                    .then(function (response) {
+                     if (!response.ok) {
+                throw Error(response.statusText);
+                }
+                return response.json();
+                  })
+                .then(function (jsonResponse) {
+                 if(jsonResponse.errors) {
+            self.errors.push(jsonResponse.errors);
+                  }else{
+                      
+                     
+                      self.likes+=1;
+                      console.log("Posts Liked");
+                    }
+                 })
+               .catch(function (error) {
+                        console.log(error);
+                    });
+            },unlike:function(){
+                let self= this;
+                var payload = {
+                post_id: this.id,
+              username:this.username
+              };
+
+              var data = new FormData();
+            data.append( "json", JSON.stringify( payload ) );
+            console.log(payload,data);
+                fetch("/api/posts/unlike", { 
+                    method: 'POST',
+                    body:payload,
+                    headers: {
+                            'Authorization': 'Bearer ' + localStorage.getItem('jwt_token'),
+                            'X-CSRFToken': token
+                        },
+                    credentials: 'same-origin'
+                    
+                    })
+                    .then(function (response) {
+                        if (!response.ok) {
+    throw Error(response.statusText);
+  }
+                return response.json();
+            })
+            .then(function (jsonResponse) {
+                 if(jsonResponse.errors) {
+            self.errors.push(jsonResponse.errors);
+          }else{
+                self.likes-=1;
+                console.log("Unliked");
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            }
+    }
 });
 
 const Timeline = Vue.component('timeline',{
   template:`
     <section class="wthree-row py-sm-5 py-3">
       <div class="container py-md-5">
+      <div class="row">
         <card  v-for="post in posts"
   v-bind:key="post.id"
   v-bind:title="post.title" 
   v-bind:caption="post.caption"
+  v-bind:liked="post.liked"
   v-bind:likes="post.likes"
   v-bind:date_post="post.date_post"
   v-bind:photo="post.photo"
   v-bind:username="post.username"></card>
-
+</div>
         
       </div>
     </section>
 `,
  data:function(){
   return {
-     posts: [
-      { id: 1, title: 'My journey with Vue',caption:'It is so easy',likes:58,date_post:'Feb 2018',photo:'https://vuejs.org/images/logo.png' ,username:'__me__'},
-      { id: 2, title: 'Blogging with Vue',caption:'-No caption-',likes:79,date_post:'Apr 2018',photo:'https://www.hover.com/blog/wp-content/uploads/2014/04/blog-button.png' ,username:'__me__'},
-      { id: 3, title: 'Why Vue is so fun',caption:'You just plug and go',likes:79,date_post:'Mar 2018',photo:'https://react-etc.net/files/2015-11/danguu.jpg' ,username:'__me__'} 
-    ]
+     posts: []
   }
- }
+ },
+ created: function () {
+            let self = this;
+            if(localStorage.getItem('jwt_token')!==null){
+                fetch("/api/posts/all", { 
+                method: 'GET',
+                headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('jwt_token'),
+                        'X-CSRFToken': token
+                    },
+                credentials: 'same-origin'
+                
+                })
+                .then(function (response) {
+                if (!response.ok) {
+          throw Error(response.statusText);
+
+               };
+              return response.json();
+        })
+        .then(function (jsonResponse) {
+          if(jsonResponse.errors) {
+            self.errors.push(jsonResponse.errors);
+          }else{
+                    self.posts=jsonResponse.posts;
+                    console.log(self.posts);
+                  }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            }
+        }
+                
+        
 });
 
 const Upload = Vue.component('upload', {
@@ -219,7 +391,6 @@ const Upload = Vue.component('upload', {
                 <button class="btn btn-primary" type="submit">Submit</button>
             </form>
       </div>
-
       </div>
     </section>
    `,
@@ -286,6 +457,7 @@ const Likes = Vue.component('likes', {
   v-bind:key="post.id"
   v-bind:title="post.title" 
   v-bind:caption="post.caption"
+  v-bind:liked="post.liked"
   v-bind:likes="post.likes"
   v-bind:date_post="post.date_post"
   v-bind:photo="post.photo"
@@ -298,7 +470,7 @@ const Likes = Vue.component('likes', {
     data: function() {
        return {
          posts: [
-      { id: 1, title: 'My journey with Vue',caption:'It is so easy',likes:58,date_post:'Feb 2018',photo:'https://vuejs.org/images/logo.png' ,username:'__me__'}
+      { id: 1, title: 'My journey with Vue',caption:'It is so easy',liked:false,likes:58,date_post:'Feb 2018',photo:'https://vuejs.org/images/logo.png' ,username:'__me__'}
       ]
        }
     }
@@ -325,7 +497,7 @@ const Following = Vue.component('following', {
     data: function() {
        return {
          posts: [
-      { id: 1, title: 'My journey with Vue',caption:'It is so easy',likes:58,date_post:'Feb 2018',photo:'https://vuejs.org/images/logo.png' ,username:'__me__'}
+      { id: 1, title: 'My journey with Vue',caption:'It is so easy',liked:false,likes:58,date_post:'Feb 2018',photo:'https://vuejs.org/images/logo.png' ,username:'__me__'}
       ]
        }
     }
@@ -386,7 +558,10 @@ const Search = Vue.component('search', {
     </section>
    `,
     data: function() {
-       return {}
+       return {
+        errors:[],
+        messages:[]
+       }
     }
 });
 // Define Routes

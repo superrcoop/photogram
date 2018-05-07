@@ -21,9 +21,9 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def get_uploaded_images(user_URI):
+def get_uploaded_image(URI):
     rootdir = os.getcwd()
-    for subdir,dirs,files in os.walk(rootdir +user_URI[1:-1]):
+    for subdir,dirs,files in os.walk(rootdir +URI[1:-1]):
         for file in files:
             ls=os.path.join(subdir,file).split('/')[-2:]
     return '/'.join(ls)

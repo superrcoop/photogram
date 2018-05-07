@@ -6,13 +6,13 @@ Werkzeug Documentation:  http://werkzeug.pocoo.org/documentation/
 
 from app import app, db, login_manager 
 from flask import render_template, request, session, redirect, url_for ,jsonify,g,_request_ctx_stack,flash
-from controllers import form_errors , allowed_file
+from controllers import form_errors , allowed_file,get_uploaded_image
 from flask_login import login_user, logout_user, current_user, login_required
 from forms import LoginForm, RegistrationForm, PostsForm
 from models import Users, Posts, Follows, Likes
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import CombinedMultiDict
-import jwt ,os
+import jwt ,os ,json
 from functools import wraps
 import base64
 
@@ -126,22 +126,101 @@ def newPost():
     error=None
     form = PostsForm(CombinedMultiDict((request.files, request.form)))
     if request.method =='POST' and form.validate_on_submit():
-        photo = form.photo.data
-        caption = form.caption.data
-        if photo.filename == '':
-            error='No selected file'
-        if photo and allowed_file(photo.filename):
-            filename = secure_filename(photo.filename)
-            newpost=Posts(user_id=current_user.id,photo=photo,caption=caption)
-            photo.save(os.path.join(newpost.post_URI, filename))
+        if form.photo.data:
+            photo=form.photo.data
+            caption = form.caption.data
+            if photo.filename == '':
+                error='No selected file'
+            if photo and allowed_file(photo.filename):
+                filename = secure_filename(photo.filename)
+                newpost=Posts(user_id=current_user.id,image_URI=photo,caption=caption)
+                photo.save(os.path.join(newpost.image_URI, filename))
+                db.session.add(newpost)
+                db.session.commit()
+                return jsonify({'messages':'Photo Post successfully'})
+            else:
+                error='File not allowed'
+                return jsonify({'errors': error})
+        else:
+            caption = form.caption.data
+            newpost=Posts(user_id=current_user.id,caption=caption)
             db.session.add(newpost)
             db.session.commit()
             return jsonify({'messages':'Post successfully'})
-        else:
-            error='File not allowed'
-            return jsonify({'errors': error})
     else:
         return jsonify({'errors':form_errors(form)})
+
+
+@app.route('/api/posts/like', methods =['POST'])
+@login_required
+@requires_auth
+def like_post():
+    if request.method == 'POST':
+        """
+        like=Likes(post_id,current_user.id)
+        db.session.add(like)
+        db.session.commit()   
+        """    
+        return jsonify(response= [{'messages':'Post successully liked'}])
+
+@app.route('/api/posts/unlike', methods =['POST'])
+@login_required
+@requires_auth
+def unlike_post():
+    if request.method == 'POST':
+        """
+        like=Likes.query.filter_by(post_id=post_id).first();
+        db.session.delete(like)
+        db.session.commit()     
+        """  
+        return jsonify(response= [{'message':'Post unliked'}])
+
+
+@app.route('/api/posts/all', methods = ['GET'])
+@login_required
+def get_all_posts():
+    error=None
+    if request.method =='GET':
+        posts=Posts.query.order_by(Posts.created_on.desc()).all()
+        listposts=[]
+        liked=False
+        for i in range (0,len(posts)):
+            count=Likes.query.filter_by(post_id=posts[i].id).all()
+            user=Users.query.filter_by(id=posts[i].user_id).first();
+            if Likes.query.filter_by(post_id=posts[i].id, user_id=current_user.id):
+                liked=True
+
+            post_data={
+            'id':posts[i].id,
+            'photo':posts[i].image_URI,#get_uploaded_image(posts[i].image_URI),
+            'caption':posts[i].caption,
+            'date_post':posts[i].created_on,
+            'likes':len(count),
+            'liked':liked,
+            'username':user.user_name,
+            'userphoto':user.profile_photo
+            }
+            listposts.append(post_data)
+        return jsonify({'posts': listposts})
+    else:
+        return jsonify({'errors':error})
+
+@app.route('/api/posts/delete', methods = ['GET','POST'])
+@login_required
+def delete_post():
+    error=None
+    if request.method =='POST':
+        """
+        data=request.data
+        post=Posts.query.filter_by(id=data.id).first();
+        if post:
+            db.session.delete(post)
+            db.session.commit()
+            return jsonify({'messages':'Post sucessfully deleted'})
+        """
+        return jsonify({'messages':'Post received'})
+    else:
+        return jsonify({'errors':error})
 
 """ A P I
 
@@ -203,30 +282,6 @@ def update_profile_photo(username):
     else:
         return jsonify({'errors':error})
 
-@app.route('/api/posts/all', methods = ['GET'])
-@login_required
-def get_all_posts():
-    error=None
-    if request.method =='GET':
-        posts=Posts.query.order_by(Posts.created_on.desc()).all()
-        listposts=[]
-        for i in range (0,len(posts)):
-            count=Likes.query.filter_by(post_id=posts[i].post_id).all()
-            user=Users.query.filter_by(id=posts[i].user_id).first();
-            post_data={
-            'id':posts[i].id,
-            'photo':post[i].Post_URI,
-            'caption':posts[i].caption,
-            'created_on':posts[i].created_on,
-            'likes':len(count),
-            'username':user.username,
-            'userphoto':user.profile_photo
-            }
-            listsposts.append(post_data)
-        return jsonify({'posts': listsposts})
-    else:
-        return jsonify({'errors':error})
-
 @app.route('/api/posts/<int:post_id>', methods = ['GET'])
 @login_required
 def get_post(post_id):
@@ -247,17 +302,6 @@ def get_post(post_id):
     else:
         return jsonify({'errors':error})
 
-@app.route('/api/posts/<int:post_id>/delete', methods = ['GET','POST'])
-@login_required
-def delete_post(post_id):
-    error=None
-    if request.method =='GET':
-        post=Posts.query.filter_by(id=post_id).first();
-        if post:
-            #remove post
-        return jsonify({'messages':'Post sucessfully deleted'})
-    else:
-        return jsonify({'errors':error})
 
 @app.route('/api/users/<username>/follow', methods = ['POST','GET'])
 @login_required
@@ -273,25 +317,6 @@ def follow_user(username):
         else:
             return jsonify(response = [{'errors':'User not found'}])
 
-
-@app.route('/api/posts/<int:post_id>/like', methods =['POST'])
-@login_required
-@requires_auth
-def like_post(post_id):
-    if request.method == 'POST':
-        like=Likes(post_id,current_user.id)
-        db.session.add(like)
-        db.session.commit()       
-        return jsonify(response= [{'messages':'Post successully liked'}])
-
-@app.route('/api/posts/<int:post_id>/unlike', methods =['POST'])
-@login_required
-@requires_auth
-def unlike_post(post_id):
-    if request.method == 'POST':
-        #userlike=Likes(post_id,current_user.id)
-        db.session.commit()       
-        return jsonify(response= [{'message':'Post unliked'}])
 
 @app.route('/api/users/<username>/unfollow', methods = ['POST'])
 @login_required

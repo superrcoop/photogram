@@ -21,7 +21,7 @@ def generate_file_URI(post_id=None):
     if post_id:      
         URI=UPLOAD_FOLDER+'/posts/'
     else:
-        URI=UPLOAD_FOLDER+'/'+str(uuid.uuid4().get_hex()[0:12])+'/'
+        URI=UPLOAD_FOLDER+'/prof_photo/'+str(uuid.uuid4().get_hex()[0:12])+'/'
     if not os.path.exists(URI):
         try:
             os.makedirs(URI)
@@ -54,7 +54,7 @@ class Users(db.Model,UserMixin):
         self.last_name = last_name
         self.email = email
         self.location=location
-        self.file_URI=generate_file_URI()
+        self.profile_photo=generate_file_URI()
         self.joined_on=get_date()
     
     def is_correct_password(self, plain_password):
@@ -82,15 +82,15 @@ class Posts(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.String(10), primary_key=True)
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'),nullable=False)
-    post_URI = db.Column(db.String(80),nullable=False)
+    image_URI = db.Column(db.String(80))
     caption = db.Column(db.String(120))
     created_on =db.Column(db.Date,nullable=False)
     likes=db.relationship("Likes",backref='posts')
 
-    def __init__(self,user_id,photo,caption):
+    def __init__(self,user_id,caption,image_URI=None):
         self.id=get_newpost_id()
         self.user_id=user_id
-        self.post_URI= generate_file_URI(id)
+        self.image_URI= generate_file_URI(id)
         self.caption=caption
         self.created_on=get_date()
 
