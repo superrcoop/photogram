@@ -410,10 +410,11 @@ const Upload = Vue.component('upload', {
         uploadPost: function () {
             let self = this;
             self.errors = [];
-          if(!self.photo){self.errors.push("Photo required.");}
+            let form_data = new FormData();
 
-        let form_data = new FormData();
-        form_data.append('photo',self.photo);
+          if(self.photo){form_data.append('photo',self.photo);}
+        
+        
         form_data.append('caption',self.caption);
             fetch("/api/posts/new", { 
             method: 'POST',
