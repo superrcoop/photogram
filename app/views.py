@@ -143,6 +143,57 @@ def newPost():
     else:
         return jsonify({'errors':form_errors(form)})
 
+
+@app.route('/api/posts/<int:post_id>/like', methods =['POST'])
+@login_required
+@requires_auth
+def like_post(post_id):
+    if request.method == 'POST':
+        like=Likes(post_id,current_user.id)
+        db.session.add(like)
+        db.session.commit()       
+        return jsonify(response= [{'messages':'Post successully liked'}])
+
+@app.route('/api/posts/<int:post_id>/unlike', methods =['POST'])
+@login_required
+@requires_auth
+def unlike_post(post_id):
+    if request.method == 'POST':
+        like=Likes.query.filter_by(post_id=post_id).first();
+        db.session.delete(like)
+        db.session.commit()       
+        return jsonify(response= [{'message':'Post unliked'}])
+
+
+@app.route('/api/posts/all', methods = ['GET'])
+@login_required
+def get_all_posts():
+    error=None
+    if request.method =='GET':
+        posts=Posts.query.order_by(Posts.created_on.desc()).all()
+        listposts=[]
+        liked=False
+        for i in range (0,len(posts)):
+            count=Likes.query.filter_by(post_id=posts[i].id).all()
+            user=Users.query.filter_by(id=posts[i].user_id).first();
+            if Likes.query.filter_by(post_id=posts[i].id, user_id=current_user.id):
+                liked=True
+
+            post_data={
+            'id':posts[i].id,
+            'photo':posts[i].post_URI,
+            'caption':posts[i].caption,
+            'created_on':posts[i].created_on,
+            'likes':len(count),
+            'liked':liked,
+            'username':user.user_name,
+            'userphoto':user.profile_photo
+            }
+            listposts.append(post_data)
+        return jsonify({'posts': listposts})
+    else:
+        return jsonify({'errors':error})
+
 """ A P I
 
 @app.route('/api/users/<username>', methods = ['GET'])
@@ -203,30 +254,6 @@ def update_profile_photo(username):
     else:
         return jsonify({'errors':error})
 
-@app.route('/api/posts/all', methods = ['GET'])
-@login_required
-def get_all_posts():
-    error=None
-    if request.method =='GET':
-        posts=Posts.query.order_by(Posts.created_on.desc()).all()
-        listposts=[]
-        for i in range (0,len(posts)):
-            count=Likes.query.filter_by(post_id=posts[i].post_id).all()
-            user=Users.query.filter_by(id=posts[i].user_id).first();
-            post_data={
-            'id':posts[i].id,
-            'photo':post[i].Post_URI,
-            'caption':posts[i].caption,
-            'created_on':posts[i].created_on,
-            'likes':len(count),
-            'username':user.username,
-            'userphoto':user.profile_photo
-            }
-            listsposts.append(post_data)
-        return jsonify({'posts': listsposts})
-    else:
-        return jsonify({'errors':error})
-
 @app.route('/api/posts/<int:post_id>', methods = ['GET'])
 @login_required
 def get_post(post_id):
@@ -273,25 +300,6 @@ def follow_user(username):
         else:
             return jsonify(response = [{'errors':'User not found'}])
 
-
-@app.route('/api/posts/<int:post_id>/like', methods =['POST'])
-@login_required
-@requires_auth
-def like_post(post_id):
-    if request.method == 'POST':
-        like=Likes(post_id,current_user.id)
-        db.session.add(like)
-        db.session.commit()       
-        return jsonify(response= [{'messages':'Post successully liked'}])
-
-@app.route('/api/posts/<int:post_id>/unlike', methods =['POST'])
-@login_required
-@requires_auth
-def unlike_post(post_id):
-    if request.method == 'POST':
-        #userlike=Likes(post_id,current_user.id)
-        db.session.commit()       
-        return jsonify(response= [{'message':'Post unliked'}])
 
 @app.route('/api/users/<username>/unfollow', methods = ['POST'])
 @login_required

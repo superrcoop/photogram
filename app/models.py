@@ -21,7 +21,7 @@ def generate_file_URI(post_id=None):
     if post_id:      
         URI=UPLOAD_FOLDER+'/posts/'
     else:
-        URI=UPLOAD_FOLDER+'/'+str(uuid.uuid4().get_hex()[0:12])+'/'
+        URI=UPLOAD_FOLDER+'/prof_photo/'+str(uuid.uuid4().get_hex()[0:12])+'/'
     if not os.path.exists(URI):
         try:
             os.makedirs(URI)
@@ -54,7 +54,7 @@ class Users(db.Model,UserMixin):
         self.last_name = last_name
         self.email = email
         self.location=location
-        self.file_URI=generate_file_URI()
+        self.profile_photo=generate_file_URI()
         self.joined_on=get_date()
     
     def is_correct_password(self, plain_password):
