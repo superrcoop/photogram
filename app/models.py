@@ -82,15 +82,15 @@ class Posts(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.String(10), primary_key=True)
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'),nullable=False)
-    post_URI = db.Column(db.String(80),nullable=False)
+    image_URI = db.Column(db.String(80))
     caption = db.Column(db.String(120))
     created_on =db.Column(db.Date,nullable=False)
     likes=db.relationship("Likes",backref='posts')
 
-    def __init__(self,user_id,photo,caption):
+    def __init__(self,user_id,caption,image_URI=None):
         self.id=get_newpost_id()
         self.user_id=user_id
-        self.post_URI= generate_file_URI(id)
+        self.image_URI= generate_file_URI(id)
         self.caption=caption
         self.created_on=get_date()
 

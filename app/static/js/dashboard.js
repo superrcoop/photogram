@@ -156,7 +156,7 @@ Vue.component('card', {
                             <img src="http://success-at-work.com/wp-content/uploads/2015/04/free-stock-photos.gif" class="profile-avatar" alt="">
                         </figure>
                         <h4 class="card-title">@{{username}}</h4>
-                        <p><i class="fa fa-tags"></i> Tags: <a href=""><span class="badge badge-info">Bootstrap</span></a> <a href=""><span class="badge badge-info">Web</span></a> <a href=""><span class="badge badge-info">CSS</span></a> <a href=""><span class="badge badge-info">HTML</span></a></p>
+                        <p><i class="fa fa-tags"></i> Tags: <a href=""><span class="badge badge-info">#waves</span></a> <a href=""><span class="badge badge-info">#CSS</span></a> <a href=""><span class="badge badge-info">#Vue.js</span></a></p>
         
                         <div class="card-text">
                             {{caption}}
@@ -165,12 +165,13 @@ Vue.component('card', {
                     <div class="card-footer">
                         <small>Posted: {{date_post}}</small>
                         <p v-if="isLiked">
-    <button @click="unlike" class="far fa-thumbs-up float-right">{{likes}}</button>
-    <button @click="unlike" class="float-right"><i class="far fa-thumbs-up"></i>{{likes}}</button>
+    <button @click="unlike" class="float-right far fa-thumbs-down">{{likes}}</button>
     </p>
      <p v-else>
-    <button @click="like" class="far fa-thumbs-down float-right">{{likes}}</button>
-    <button @click="like" class="float-right"><i class="far fa-thumbs-down"></i>{{likes}}</button>
+    <a @click=like" class="float-right far fa-thumbs-up"> {{likes}}</a>
+    </p>
+    <p v-if="this.username===this.user">
+    <button @click="delete_post" class="fas fa-trash-alt float-right"></button>
     </p>
                     </div>
                 </div>
@@ -178,16 +179,63 @@ Vue.component('card', {
     `,props:['id','username','likes','date_post','tags','caption',"photo","liked"],
     data:function(){
       return {
-        isLiked:this.liked
+        isLiked:this.liked,
+        user:localStorage.getItem('username'),
+        post_id:this.id
       }
     }
     ,methods:{
+      delete_post:function(){
+        let self= this;
+                var payload = {
+                post_id: self.id,
+              username:self.username
+              };
 
+              var data = new FormData();
+            data.append( "json", JSON.stringify( payload ) );
+            console.log(payload,data);
+                fetch("/api/posts/delete", { 
+                    method: 'POST',
+                    body:payload,
+                    headers: {
+                            'Authorization': 'Bearer ' + localStorage.getItem('jwt_token'),
+                            'X-CSRFToken': token
+                        },
+                    credentials: 'same-origin'
+                    
+                    })
+                    .then(function (response) {
+                     if (!response.ok) {
+                throw Error(response.statusText);
+                }
+                return response.json();
+                  })
+                .then(function (jsonResponse) {
+                 if(jsonResponse.errors) {
+            self.errors.push(jsonResponse.errors);
+                  }else{
+                      console.log(jsonResponse);
+                      console.log("Deleted");
+                    }
+                 })
+               .catch(function (error) {
+                        console.log(error);
+                    });
+      },
             like:function(){
                 let self= this;
+                var payload = {
+                post_id: this.id,
+              username:this.username
+              };
 
-                fetch("/api/posts/"+self.id+"/like", { 
+              var data = new FormData();
+            data.append( "json", JSON.stringify( payload ) );
+            console.log(payload,data);
+                fetch("/api/posts/like", { 
                     method: 'POST',
+                    body:payload,
                     headers: {
                             'Authorization': 'Bearer ' + localStorage.getItem('jwt_token'),
                             'X-CSRFToken': token
@@ -216,8 +264,17 @@ Vue.component('card', {
                     });
             },unlike:function(){
                 let self= this;
-                fetch("/api/posts/"+self.id+"/unlike", { 
+                var payload = {
+                post_id: this.id,
+              username:this.username
+              };
+
+              var data = new FormData();
+            data.append( "json", JSON.stringify( payload ) );
+            console.log(payload,data);
+                fetch("/api/posts/unlike", { 
                     method: 'POST',
+                    body:payload,
                     headers: {
                             'Authorization': 'Bearer ' + localStorage.getItem('jwt_token'),
                             'X-CSRFToken': token
@@ -501,7 +558,10 @@ const Search = Vue.component('search', {
     </section>
    `,
     data: function() {
-       return {}
+       return {
+        errors:[],
+        messages:[]
+       }
     }
 });
 // Define Routes
