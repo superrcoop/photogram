@@ -8,13 +8,12 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    {% block title %} {% endblock %}
+    <title>Photogram</title>
 
     <!-- Bootstrap -->
-    <link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-     <link rel="stylesheet" href="{{ url_for('static', filename='css/photogram.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
     {% block css %} {% endblock%}
   </head>
   <body>
@@ -23,23 +22,13 @@
     </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" ></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/vue.js') }}"></script>
-    <script> const token = "{{ csrf_token() }}"  ;</script>
     <script src="{{ url_for('static', filename='js/vue-router.js') }}"></script>
+    <script>const token = "{{ csrf_token() }}";</script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
-    <script>
-
-    var ul = $('#upload ul');
-
-    $('#drop a').click(function(){
-        // Simulate a click on the file input button
-        // to show the file browser dialog
-        $(this).parent().find('input').click();
-    });
-</script>
     {% block js %} {% endblock%}
   </body>
 </html>

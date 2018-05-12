@@ -1,17 +1,7 @@
 {% extends "base.html" %}
-{% block title %} <title>Photogram</title>{% endblock%}
+
 {% block main %}
 <div id="app">
-	 {% with messages = get_flashed_messages()
- 		%}
-   		{% if messages %}
-     <ul class="flashes">
-     {% for message in messages %}
-       <li>{{ message }}</li>
-     {% endfor %}
-     </ul>
-   {% endif %}
- 		{% endwith %}
     <app-header></app-header>
 
     <main>
